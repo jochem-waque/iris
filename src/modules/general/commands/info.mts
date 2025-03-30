@@ -30,7 +30,9 @@ export const Info = d
 ❓ ⁠— I'm confused; clarify
 ⏲️ ⁠— Maybe later; busy
 💬 ⁠— Can we VC about this?; no other option applies
-‼️ ⁠— Acknowledgment; I understand`,
+‼️ ⁠— Acknowledgment; I understand
+
+If these reactions weren't supposed to be added to your message, you can right click (or long press) on your message and select the "Remove reactions" command under "Apps".`,
             },
             {
               name: "Voice topics",
