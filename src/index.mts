@@ -8,11 +8,11 @@ import { GatewayIntentBits, Partials } from "discord.js"
 import { drizzle } from "drizzle-orm/libsql"
 import { migrate } from "drizzle-orm/libsql/migrator"
 import d from "fluent-commands"
-import { Env } from "./variables.mjs"
-
 import { General } from "./modules/general/general.mjs"
 import { Reactions } from "./modules/reactions/reactions.mjs"
 import { Voice } from "./modules/voice/voice.mjs"
+import { Env } from "./variables.mjs"
+
 export const Database = drizzle(Env.dbFileName)
 
 await migrate(Database, { migrationsFolder: "./drizzle" })
