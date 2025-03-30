@@ -1,0 +1,8 @@
+{
+  "extends": ["@tsconfig/node23", "@tsconfig/strictest"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "sourceMap": true
+  },
+  "include": ["src/**/*"]
+}
