@@ -11,4 +11,15 @@ export const Startup = d
   .once()
   .handler((client) => {
     console.log("Running as", client.user.displayName)
+
+    // FIXME: move into fluent-commands?
+    function exitListener() {
+      client
+        .destroy()
+        .catch(console.error)
+        .finally(() => process.exit())
+    }
+
+    process.on("SIGINT", exitListener)
+    process.on("SIGTERM", exitListener)
   })
