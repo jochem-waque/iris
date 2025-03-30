@@ -12,8 +12,9 @@ export const NoiseDropdown = d
   .string("noise")
   .placeholder("Select the noise level")
   .options({
-    Low: d.select().stringOption("low").emoji("🔈"),
-    Medium: d.select().stringOption("medium").emoji("🔉"),
+    Silent: d.select().stringOption("silent").emoji("🔇"),
+    Low: d.select().stringOption("quiet").emoji("🔈"),
+    Medium: d.select().stringOption("moderate").emoji("🔉"),
     Loud: d.select().stringOption("loud").emoji("🔊"),
   })
   .handler(async (interaction) => {
