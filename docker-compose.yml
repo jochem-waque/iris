@@ -3,7 +3,7 @@ services:
     build: .
     environment:
       BOT_TOKEN: "${BOT_TOKEN}"
-      DB_FILE_NAME: "./data/bot.db"
+      DB_FILE_NAME: "file:data/bot.db"
     restart: unless-stopped
     volumes:
       - iris-data:/app/data
