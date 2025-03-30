@@ -17,9 +17,7 @@ export const Info = d
         new EmbedBuilder()
           .setTitle("Bot information")
           .setDescription(
-            `Hi! This is information for the [ Insert name here ] bot.
-
-This Discord bot is a multi-purpose tool used to accommodate and make servers accessible for physically disabled members. It includes a reaction-based communication system for those with voice access technology on their devices due to physical disability. It also incorporates a reminder system for setting appropriate voice channel topics.`,
+            `Iris is a multi-purpose tool used to accommodate and make servers accessible for physically disabled members. It includes a reaction-based communication system for those with voice access technology on their devices due to physical disability. It also incorporates a reminder system for setting appropriate voice channel topics.`,
           )
           .setFields(
             {
