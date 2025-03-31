@@ -4,7 +4,9 @@ A simple Discord bot that adds reactions to messages and reminds people to set v
 
 ## Usage
 
-Simply edit `example.env`, rename it to `.env`, and run `docker compose up`.
+1. Edit `example.env` and save it as `.env`
+2. Edit `blacklist.example.json` and save it as `blacklist.json`
+3. Run `docker compose up`
 
 ## License
 

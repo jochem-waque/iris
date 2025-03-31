@@ -24,6 +24,7 @@ import {
 } from "discord.js"
 import { desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
+import { Blacklist } from "../../blacklist.mjs"
 import { Database } from "../../index.mjs"
 import { activitiesTable, linkTable, messageTable } from "../../schema.mjs"
 import { ActivityDropdown } from "./components/activityDropdown.mjs"
@@ -49,6 +50,11 @@ export async function voiceStatus({
   activity ??= selectedValue(oldMessage?.components[0]?.components[0]?.data)
   noise ??= selectedValue(oldMessage?.components[1]?.components[0]?.data)
   voiceId ??= oldMessage?.embeds[0]?.fields[0]?.value.slice(2, -1)
+
+  // TODO resending the message isn't *really* necessary if no one gets mentioned
+  if (mention && Blacklist.has(mention)) {
+    mention = undefined
+  }
 
   const activities = await Database.select()
     .from(activitiesTable)
