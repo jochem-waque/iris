@@ -46,8 +46,7 @@ export const AddActivity = modal({
       guild: interaction.guild,
     })
 
-    await interaction.deferUpdate()
-    await interaction.message?.edit(messageOptions)
+    await interaction.update(messageOptions)
 
     await conditionallyUpdateStatus(interaction, status, channelId)
   },
