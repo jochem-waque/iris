@@ -4,6 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ChannelType } from "discord.js"
 import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -21,6 +22,13 @@ export const SubsequentJoin = d
   .event("voiceStateUpdate")
   .handler(async (oldState, newState) => {
     if (!newState.channel || oldState.channelId === newState.channelId) {
+      return
+    }
+
+    if (
+      newState.channelId === newState.channel.guild.afkChannelId ||
+      newState.channel.type === ChannelType.GuildStageVoice
+    ) {
       return
     }
 

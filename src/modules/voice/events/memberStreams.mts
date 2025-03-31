@@ -9,6 +9,7 @@ import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
 
+import { ChannelType } from "discord.js"
 import {
   fetchOldMessage,
   getTextChannel,
@@ -21,6 +22,13 @@ export const MemberStreams = d
   .event("voiceStateUpdate")
   .handler(async (oldState, newState) => {
     if (oldState.streaming || !newState.streaming || !newState.channel) {
+      return
+    }
+
+    if (
+      newState.channelId === newState.channel.guild.afkChannelId ||
+      newState.channel.type === ChannelType.GuildStageVoice
+    ) {
       return
     }
 
