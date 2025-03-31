@@ -81,7 +81,11 @@ export async function voiceStatus({
     currentNoise.default = true
   }
 
-  const embed = new EmbedBuilder().setTitle("Voice channel topic")
+  const embed = new EmbedBuilder()
+    .setTitle("Voice channel topic")
+    .setDescription(
+      "Please make sure that the activity and noise level that you select are representative of what is happening in the VC, and not relevant to just you or your stream.",
+    )
 
   if (voiceId) {
     embed.setFields({ name: "Channel", value: channelMention(voiceId) })
