@@ -81,7 +81,7 @@ export async function voiceStatus({
     currentNoise.default = true
   }
 
-  const embed = new EmbedBuilder().setTitle("Voice channel status")
+  const embed = new EmbedBuilder().setTitle("Voice channel topic")
 
   if (voiceId) {
     embed.setFields({ name: "Channel", value: channelMention(voiceId) })
