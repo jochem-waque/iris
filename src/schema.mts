@@ -30,12 +30,20 @@ export const mentionTable = sqliteTable("mention", {
 // All current voice status messages
 export const messageTable = sqliteTable("message", {
   id: int().primaryKey(),
-  channel_id: text().notNull().unique(),
+  channel_id: text().notNull(),
   message_id: text().notNull().unique(),
+  voice_id: text().notNull().unique(),
 })
 
 // Don't ping users as they join non-empty voice channels
 export const joinPingsTable = sqliteTable("join_ping", {
   id: int().primaryKey(),
   user_id: text().notNull().unique(),
+})
+
+// Links between text and voice channels
+export const linkTable = sqliteTable("link", {
+  id: int().primaryKey(),
+  text_id: text().notNull(),
+  voice_id: text().notNull().unique(),
 })

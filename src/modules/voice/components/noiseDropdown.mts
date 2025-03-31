@@ -5,7 +5,7 @@
  */
 
 import d from "fluent-commands"
-import { setVoiceChannelStatus, voiceStatus } from "../util.mjs"
+import { conditionallyUpdateStatus, voiceStatus } from "../util.mjs"
 
 export const NoiseDropdown = d
   .select()
@@ -18,17 +18,17 @@ export const NoiseDropdown = d
     Loud: d.select().stringOption("loud").emoji("🔊"),
   })
   .handler(async (interaction) => {
-    if (!interaction.channel?.isVoiceBased() || !interaction.values[0]) {
+    if (!interaction.values[0] || !interaction.inCachedGuild()) {
       return
     }
 
-    const { messageOptions, status } = await voiceStatus({
+    const { messageOptions, status, channelId } = await voiceStatus({
       noise: interaction.values[0],
       oldMessage: interaction.message,
-      channel: interaction.channel,
+      guild: interaction.guild,
     })
 
     await interaction.update(messageOptions)
 
-    await setVoiceChannelStatus(interaction.channel, status)
+    await conditionallyUpdateStatus(interaction, status, channelId)
   })

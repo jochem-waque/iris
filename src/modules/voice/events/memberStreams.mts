@@ -10,6 +10,8 @@ import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
 
 import {
+  fetchOldMessage,
+  getTextChannel,
   voiceStateIsBot,
   voiceStatus,
   VoiceStatusMessageOptions,
@@ -27,27 +29,30 @@ export const MemberStreams = d
     }
 
     const options: VoiceStatusMessageOptions = {
-      channel: newState.channel,
+      voiceId: newState.channel.id,
+      guild: newState.guild,
       mention: newState.id,
     }
 
     const [old] = await Database.delete(messageTable)
-      .where(eq(messageTable.channel_id, newState.channel.id))
+      .where(eq(messageTable.voice_id, newState.channel.id))
       .returning()
 
-    let oldMessage
-    if (old) {
-      oldMessage = await newState.channel.messages.fetch(old.message_id)
+    const oldMessage = await fetchOldMessage(newState.guild, old)
+    if (oldMessage) {
       options.oldMessage = oldMessage
     }
 
     const { messageOptions } = await voiceStatus(options)
 
-    const message = await newState.channel.send(messageOptions)
+    const channel = await getTextChannel(newState.channel)
+
+    const message = await channel.send(messageOptions)
 
     await Database.insert(messageTable).values({
       channel_id: message.channelId,
       message_id: message.id,
+      voice_id: newState.channel.id,
     })
 
     await oldMessage?.delete()

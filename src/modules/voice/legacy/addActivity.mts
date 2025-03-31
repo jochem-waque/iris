@@ -7,7 +7,7 @@
 import { TextInputBuilder, TextInputStyle } from "discord.js"
 import { Database } from "../../../index.mjs"
 import { activitiesTable } from "../../../schema.mjs"
-import { setVoiceChannelStatus, voiceStatus } from "../util.mjs"
+import { conditionallyUpdateStatus, voiceStatus } from "../util.mjs"
 import { modal, modalInput } from "./modal.mjs"
 
 export const AddActivity = modal({
@@ -24,12 +24,12 @@ export const AddActivity = modal({
     ),
   ],
   async handle(interaction, { name }) {
-    if (!interaction.channel?.isVoiceBased() || !interaction.isFromMessage()) {
+    if (!interaction.inCachedGuild() || !interaction.isFromMessage()) {
       return
     }
 
     const [newActivity] = await Database.insert(activitiesTable)
-      .values({ label: name, guild_id: interaction.channel.guildId })
+      .values({ label: name, guild_id: interaction.guildId })
       .onConflictDoUpdate({
         target: [activitiesTable.label, activitiesTable.guild_id],
         set: { last_used: new Date() },
@@ -40,14 +40,15 @@ export const AddActivity = modal({
       return
     }
 
-    const { messageOptions, status } = await voiceStatus({
+    const { messageOptions, status, channelId } = await voiceStatus({
       activity: newActivity.id.toString(),
       oldMessage: interaction.message,
-      channel: interaction.channel,
+      guild: interaction.guild,
     })
 
     await interaction.deferUpdate()
     await interaction.message?.edit(messageOptions)
-    await setVoiceChannelStatus(interaction.channel, status)
+
+    await conditionallyUpdateStatus(interaction, status, channelId)
   },
 })

@@ -8,7 +8,14 @@ import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { joinPingsTable, messageTable } from "../../../schema.mjs"
-import { voiceChannelStates, voiceStateIsBot, voiceStatus } from "../util.mjs"
+import {
+  fetchOldMessage,
+  getTextChannel,
+  voiceChannelStates,
+  voiceStateIsBot,
+  voiceStatus,
+  VoiceStatusMessageOptions,
+} from "../util.mjs"
 
 export const SubsequentJoin = d
   .event("voiceStateUpdate")
@@ -36,27 +43,31 @@ export const SubsequentJoin = d
     }
 
     const [old] = await Database.delete(messageTable)
-      .where(eq(messageTable.channel_id, newState.channel.id))
+      .where(eq(messageTable.voice_id, newState.channel.id))
       .returning()
 
-    if (!old) {
-      return
+    const options: VoiceStatusMessageOptions = {
+      voiceId: newState.channel.id,
+      guild: newState.guild,
+      mention: newState.id,
     }
 
-    const oldMessage = await newState.channel.messages.fetch(old.message_id)
+    const oldMessage = await fetchOldMessage(newState.guild, old)
+    if (oldMessage) {
+      options.oldMessage = oldMessage
+    }
 
-    const { messageOptions } = await voiceStatus({
-      channel: newState.channel,
-      oldMessage,
-      mention: newState.id,
-    })
+    const { messageOptions } = await voiceStatus(options)
 
-    const message = await newState.channel.send(messageOptions)
+    const channel = await getTextChannel(newState.channel)
+
+    const message = await channel.send(messageOptions)
 
     await Database.insert(messageTable).values({
       channel_id: message.channelId,
       message_id: message.id,
+      voice_id: newState.channel.id,
     })
 
-    await oldMessage.delete()
+    await oldMessage?.delete()
   })

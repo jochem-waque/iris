@@ -8,7 +8,13 @@ import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
-import { voiceChannelStates, voiceStateIsBot, voiceStatus } from "../util.mjs"
+import {
+  deleteOldMessage,
+  getTextChannel,
+  voiceChannelStates,
+  voiceStateIsBot,
+  voiceStatus,
+} from "../util.mjs"
 
 export const FirstJoin = d
   .event("voiceStateUpdate")
@@ -27,22 +33,24 @@ export const FirstJoin = d
     }
 
     const { messageOptions } = await voiceStatus({
-      channel: newState.channel,
+      voiceId: newState.channel.id,
+      guild: newState.guild,
       mention: newState.id,
     })
 
-    const message = await newState.channel.send(messageOptions)
+    const channel = await getTextChannel(newState.channel)
+
+    const message = await channel.send(messageOptions)
 
     const [old] = await Database.delete(messageTable)
-      .where(eq(messageTable.channel_id, message.channelId))
+      .where(eq(messageTable.voice_id, newState.channel.id))
       .returning()
 
     await Database.insert(messageTable).values({
       channel_id: message.channelId,
       message_id: message.id,
+      voice_id: newState.channel.id,
     })
 
-    if (old) {
-      await message.channel.messages.delete(old.message_id)
-    }
+    await deleteOldMessage(channel.guild, old)
   })

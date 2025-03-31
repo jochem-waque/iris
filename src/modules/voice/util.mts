@@ -7,9 +7,16 @@
 import {
   AnyComponent,
   APISelectMenuOption,
+  BaseInteraction,
+  channelMention,
   ComponentType,
-  heading,
+  DiscordAPIError,
+  EmbedBuilder,
+  Guild,
+  InteractionUpdateOptions,
   Message,
+  MessageCreateOptions,
+  RESTJSONErrorCodes,
   Snowflake,
   userMention,
   VoiceBasedChannel,
@@ -18,12 +25,13 @@ import {
 import { desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../index.mjs"
-import { activitiesTable } from "../../schema.mjs"
+import { activitiesTable, linkTable, messageTable } from "../../schema.mjs"
 import { ActivityDropdown } from "./components/activityDropdown.mjs"
 import { NoiseDropdown } from "./components/noiseDropdown.mjs"
 
 export type VoiceStatusMessageOptions = {
-  channel: VoiceBasedChannel
+  guild: Guild
+  voiceId?: Snowflake
   activity?: string
   noise?: string
   oldMessage?: Message
@@ -31,7 +39,8 @@ export type VoiceStatusMessageOptions = {
 }
 
 export async function voiceStatus({
-  channel,
+  voiceId,
+  guild,
   activity,
   noise,
   oldMessage,
@@ -39,10 +48,11 @@ export async function voiceStatus({
 }: VoiceStatusMessageOptions) {
   activity ??= selectedValue(oldMessage?.components[0]?.components[0]?.data)
   noise ??= selectedValue(oldMessage?.components[1]?.components[0]?.data)
+  voiceId ??= oldMessage?.embeds[0]?.fields[0]?.value.slice(2, -1)
 
   const activities = await Database.select()
     .from(activitiesTable)
-    .where(eq(activitiesTable.guild_id, channel.guildId))
+    .where(eq(activitiesTable.guild_id, guild.id))
     .orderBy(desc(activitiesTable.last_used))
     .limit(24)
 
@@ -71,20 +81,28 @@ export async function voiceStatus({
     currentNoise.default = true
   }
 
-  let content = heading("Voice channel status")
+  const embed = new EmbedBuilder().setTitle("Voice channel status")
+
+  if (voiceId) {
+    embed.setFields({ name: "Channel", value: channelMention(voiceId) })
+  }
+
+  const messageOptions: InteractionUpdateOptions & MessageCreateOptions = {
+    components: [d.row(activityDropdown), d.row(noiseDropdown)],
+    embeds: [embed],
+  }
+
   if (mention) {
-    content += `\n${userMention(mention)}`
+    messageOptions.content = `\n${userMention(mention)}`
   }
 
   return {
-    messageOptions: {
-      content,
-      components: [d.row(activityDropdown), d.row(noiseDropdown)],
-    },
+    messageOptions,
     status:
       currentActivity || currentNoise
         ? `${formatOption(currentActivity)} | ${formatOption(currentNoise).toLowerCase()}`
         : null,
+    channelId: voiceId,
   }
 }
 
@@ -114,6 +132,136 @@ export async function voiceStateIsBot(state: VoiceState) {
 
   const user = await state.client.users.fetch(state.id)
   return user.bot
+}
+
+export async function getTextChannel(channel: VoiceBasedChannel) {
+  const [link] = await Database.select()
+    .from(linkTable)
+    .where(eq(linkTable.voice_id, channel.id))
+    .limit(1)
+
+  if (!link) {
+    return channel
+  }
+
+  let linkedChannel
+  try {
+    linkedChannel = await channel.guild.channels.fetch(link.text_id)
+  } catch (e) {
+    if (
+      !(e instanceof DiscordAPIError) ||
+      e.code !== RESTJSONErrorCodes.UnknownChannel
+    ) {
+      throw e
+    }
+
+    return channel
+  }
+
+  return linkedChannel?.isTextBased() ? linkedChannel : channel
+}
+
+export async function deleteOldMessage(
+  guild: Guild,
+  old?: typeof messageTable.$inferSelect,
+) {
+  if (!old) {
+    return
+  }
+
+  let channel
+  try {
+    channel = await guild.channels.fetch(old.channel_id)
+  } catch (e) {
+    if (
+      !(e instanceof DiscordAPIError) ||
+      e.code !== RESTJSONErrorCodes.UnknownChannel
+    ) {
+      throw e
+    }
+
+    return
+  }
+
+  if (!channel?.isTextBased()) {
+    return
+  }
+
+  try {
+    await channel.messages.delete(old.message_id)
+  } catch (e) {
+    if (
+      !(e instanceof DiscordAPIError) ||
+      e.code !== RESTJSONErrorCodes.UnknownMessage
+    ) {
+      throw e
+    }
+
+    return
+  }
+}
+
+export async function fetchOldMessage(
+  guild: Guild,
+  old?: typeof messageTable.$inferSelect,
+) {
+  if (!old) {
+    return null
+  }
+
+  let channel
+  try {
+    channel = await guild.channels.fetch(old.channel_id)
+  } catch (e) {
+    if (
+      !(e instanceof DiscordAPIError) ||
+      e.code !== RESTJSONErrorCodes.UnknownChannel
+    ) {
+      throw e
+    }
+
+    return
+  }
+
+  if (!channel?.isTextBased()) {
+    return null
+  }
+
+  let message
+  try {
+    message = await channel.messages.fetch(old.message_id)
+  } catch (e) {
+    if (
+      !(e instanceof DiscordAPIError) ||
+      e.code !== RESTJSONErrorCodes.UnknownMessage
+    ) {
+      throw e
+    }
+
+    return null
+  }
+
+  return message
+}
+
+export async function conditionallyUpdateStatus(
+  interaction: BaseInteraction<"cached">,
+  status: string | null,
+  channelId?: string,
+) {
+  if (interaction.channel?.isVoiceBased()) {
+    await setVoiceChannelStatus(interaction.channel, status)
+    return
+  }
+
+  if (!channelId) {
+    return
+  }
+
+  const channel = await interaction.guild.channels.fetch(channelId)
+  if (channel?.isVoiceBased()) {
+    await setVoiceChannelStatus(channel, status)
+  }
 }
 
 function formatOption(option?: APISelectMenuOption) {

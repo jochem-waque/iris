@@ -9,7 +9,7 @@ import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { activitiesTable } from "../../../schema.mjs"
 import { AddActivity } from "../legacy/addActivity.mjs"
-import { setVoiceChannelStatus, voiceStatus } from "../util.mjs"
+import { conditionallyUpdateStatus, voiceStatus } from "../util.mjs"
 
 export const ActivityDropdown = d
   .select()
@@ -22,7 +22,7 @@ export const ActivityDropdown = d
       .emoji("➕"),
   })
   .handler(async (interaction) => {
-    if (!interaction.values[0] || !interaction.channel?.isVoiceBased()) {
+    if (!interaction.values[0] || !interaction.inCachedGuild()) {
       return
     }
 
@@ -35,13 +35,13 @@ export const ActivityDropdown = d
       .set({ last_used: new Date() })
       .where(eq(activitiesTable.id, parseInt(interaction.values[0])))
 
-    const { messageOptions, status } = await voiceStatus({
+    const { messageOptions, status, channelId } = await voiceStatus({
       activity: interaction.values[0],
       oldMessage: interaction.message,
-      channel: interaction.channel,
+      guild: interaction.guild,
     })
 
     await interaction.update(messageOptions)
 
-    await setVoiceChannelStatus(interaction.channel, status)
+    await conditionallyUpdateStatus(interaction, status, channelId)
   })

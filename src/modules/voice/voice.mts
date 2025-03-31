@@ -5,6 +5,7 @@
  */
 
 import d from "fluent-commands"
+import { Link } from "./commands/link.mjs"
 import { TogglePings } from "./commands/togglePings.mjs"
 import { ActivityDropdown } from "./components/activityDropdown.mjs"
 import { NoiseDropdown } from "./components/noiseDropdown.mjs"
@@ -16,6 +17,7 @@ import { SubsequentJoin } from "./events/subsequentJoin.mjs"
 
 export const Voice = d
   .module("voice")
+  .addCommand(Link)
   .addCommand(TogglePings)
   .addComponent(ActivityDropdown)
   .addComponent(NoiseDropdown)
