@@ -6,6 +6,7 @@
 
 import { EmbedBuilder, MessageFlags } from "discord.js"
 import d from "fluent-commands"
+import { Reactions } from "../../reactions/commands/reactions.mjs"
 import { TogglePings } from "../../voice/commands/togglePings.mjs"
 
 export const Info = d
@@ -31,6 +32,8 @@ export const Info = d
 ⏲️ ⁠— Maybe later; busy
 💬 ⁠— Can we VC about this?; no other option applies
 ‼️ ⁠— Acknowledgment; I understand
+
+You can also add reactions to your messages by right clicking (or long pressing) them and selecting the "Add reactions" command under "Apps", or to your latest message by using the ${Reactions.id ? `</${Reactions.name} add:${Reactions.id}>` : "/reactions add"} command.
 
 If these reactions weren't supposed to be added to your message, you can right click (or long press) on your message and select the "Remove reactions" command under "Apps".`,
             },
