@@ -5,12 +5,14 @@
  */
 
 import d from "fluent-commands"
+import { Add } from "./commands/add.mjs"
+import { Reactions as ReactionsCommand } from "./commands/reactions.mjs"
 import { Remove } from "./commands/remove.mjs"
-import { ToggleReactions } from "./commands/toggleReactions.mjs"
 import { ReactOnMention } from "./events/reactOnMention.mjs"
 
 export const Reactions = d
   .module("reactions")
   .addCommand(Remove)
-  .addCommand(ToggleReactions)
+  .addCommand(Add)
+  .addCommand(ReactionsCommand)
   .addEventHandler(ReactOnMention)

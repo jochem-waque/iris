@@ -8,7 +8,7 @@ import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { mentionTable } from "../../../schema.mjs"
 
-const reactions = ["❌", "✅", "🤔", "❓", "⏲️", "💬", "‼️"]
+export const Emojis = ["❌", "✅", "🤔", "❓", "⏲️", "💬", "‼️"]
 
 export const ReactOnMention = d
   .event("messageCreate")
@@ -26,7 +26,7 @@ export const ReactOnMention = d
       return
     }
 
-    for (const reaction of reactions) {
-      await message.react(reaction)
+    for (const emoji of Emojis) {
+      await message.react(emoji)
     }
   })
