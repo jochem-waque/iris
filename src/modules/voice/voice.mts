@@ -5,10 +5,12 @@
  */
 
 import d from "fluent-commands"
+import { Activities } from "./commands/activities.mjs"
 import { Link } from "./commands/link.mjs"
 import { TogglePings } from "./commands/togglePings.mjs"
 import { ActivityDropdown } from "./components/activityDropdown.mjs"
 import { NoiseDropdown } from "./components/noiseDropdown.mjs"
+import { RemoveActivityDropdown } from "./components/removeActivityDropdown.mjs"
 import { FirstJoin } from "./events/firstJoin.mjs"
 import { LastLeave } from "./events/lastLeave.mjs"
 import { MemberStreams } from "./events/memberStreams.mjs"
@@ -17,10 +19,12 @@ import { SubsequentJoin } from "./events/subsequentJoin.mjs"
 
 export const Voice = d
   .module("voice")
+  .addCommand(Activities)
   .addCommand(Link)
   .addCommand(TogglePings)
   .addComponent(ActivityDropdown)
   .addComponent(NoiseDropdown)
+  .addComponent(RemoveActivityDropdown)
   .addEventHandler(FirstJoin)
   .addEventHandler(LastLeave)
   .addEventHandler(MemberStreams)
