@@ -36,6 +36,7 @@ export const ActivityDropdown = d
       .where(eq(activitiesTable.id, parseInt(interaction.values[0])))
 
     const { messageOptions, status, channelId } = await voiceStatus({
+      force: true,
       activity: interaction.values[0],
       oldMessage: interaction.message,
       guild: interaction.guild,

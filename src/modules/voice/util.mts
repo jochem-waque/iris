@@ -39,6 +39,12 @@ export type VoiceStatusMessageOptions = {
   mention?: Snowflake
 }
 
+type VoiceStatus = {
+  messageOptions: InteractionUpdateOptions & MessageCreateOptions
+  status: string | null
+  channelId: string | undefined
+}
+
 export async function voiceStatus({
   voiceId,
   guild,
@@ -46,15 +52,32 @@ export async function voiceStatus({
   noise,
   oldMessage,
   mention,
-}: VoiceStatusMessageOptions) {
+}: VoiceStatusMessageOptions): Promise<Partial<VoiceStatus>>
+export async function voiceStatus({
+  force,
+  voiceId,
+  guild,
+  activity,
+  noise,
+  oldMessage,
+  mention,
+}: VoiceStatusMessageOptions & { force: true }): Promise<VoiceStatus>
+export async function voiceStatus({
+  force,
+  voiceId,
+  guild,
+  activity,
+  noise,
+  oldMessage,
+  mention,
+}: VoiceStatusMessageOptions & { force?: true }) {
+  if (!mention || Blacklist.has(mention) || !force) {
+    return {}
+  }
+
   activity ??= selectedValue(oldMessage?.components[0]?.components[0]?.data)
   noise ??= selectedValue(oldMessage?.components[1]?.components[0]?.data)
   voiceId ??= oldMessage?.embeds[0]?.fields[0]?.value.slice(2, -1)
-
-  // TODO resending the message isn't *really* necessary if no one gets mentioned
-  if (mention && Blacklist.has(mention)) {
-    mention = undefined
-  }
 
   const activities = await Database.select()
     .from(activitiesTable)
