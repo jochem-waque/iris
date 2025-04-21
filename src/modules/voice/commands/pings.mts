@@ -129,7 +129,8 @@ export function joinPings(
   if (memberConfig?.join_ping_cooldown) {
     return {
       guild,
-      member: Math.min(memberConfig.join_ping_cooldown, guild.maxCooldown),
+      member:
+        Math.min(memberConfig.join_ping_cooldown, guild.maxCooldown) || true,
     }
   }
 
@@ -173,7 +174,9 @@ export function streamingPings(
   if (memberConfig?.streaming_ping_cooldown) {
     return {
       guild,
-      member: Math.min(memberConfig.streaming_ping_cooldown, guild.maxCooldown),
+      member:
+        Math.min(memberConfig.streaming_ping_cooldown, guild.maxCooldown) ||
+        true,
     }
   }
 
