@@ -8,7 +8,7 @@ import { ChannelType } from "discord.js"
 import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
-import { joinPingsTable, messageTable } from "../../../schema.mjs"
+import { messageTable } from "../../../schema.mjs"
 import {
   fetchOldMessage,
   getTextChannel,
@@ -41,14 +41,14 @@ export const SubsequentJoin = d
       return
     }
 
-    const [noPing] = await Database.select()
-      .from(joinPingsTable)
-      .where(eq(joinPingsTable.user_id, newState.id))
-      .limit(1)
+    // const [noPing] = await Database.select()
+    //   .from(joinPingsTable)
+    //   .where(eq(joinPingsTable.user_id, newState.id))
+    //   .limit(1)
 
-    if (noPing) {
-      return
-    }
+    // if (noPing) {
+    //   return
+    // }
 
     const voiceChannel = newState.channel
     const options: VoiceStatusMessageOptions = {

@@ -26,9 +26,20 @@ import { desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Blacklist } from "../../blacklist.mjs"
 import { Database } from "../../index.mjs"
-import { activitiesTable, linkTable, messageTable } from "../../schema.mjs"
+import {
+  activitiesTable,
+  guildConfigTable,
+  linkTable,
+  messageTable,
+} from "../../schema.mjs"
 import { ActivityDropdown } from "./components/activityDropdown.mjs"
 import { NoiseDropdown } from "./components/noiseDropdown.mjs"
+import { ServerDefaultJoinPingCooldown } from "./components/serverDefaultJoinPingCooldown.mjs"
+import { ServerDefaultStreamingPingCooldown } from "./components/serverDefaultStreamingPingCooldown.mjs"
+import { ServerJoinPingOptOut } from "./components/serverJoinPingOptOut.mjs"
+import { ServerMaxJoinPingCooldown } from "./components/serverMaxJoinPingCooldown.mjs"
+import { ServerMaxStreamingPingCooldown } from "./components/serverMaxStreamingPingCooldown.mjs"
+import { ServerStreamingPingOptOut } from "./components/serverStreamingPingOptOut.mjs"
 
 export type VoiceStatusMessageOptions = {
   guild: Guild
@@ -294,6 +305,91 @@ export async function conditionallyUpdateStatus(
   const channel = await interaction.guild.channels.fetch(channelId)
   if (channel?.isVoiceBased()) {
     await setVoiceChannelStatus(channel, status)
+  }
+}
+
+export function serverJoinPingSettings(
+  config?: Pick<
+    typeof guildConfigTable.$inferSelect,
+    | "max_join_ping_cooldown"
+    | "allow_join_opt_out"
+    | "default_join_ping_cooldown"
+  >,
+) {
+  config ??= {
+    max_join_ping_cooldown: Number(
+      guildConfigTable.max_join_ping_cooldown.default,
+    ),
+    allow_join_opt_out: guildConfigTable.allow_join_opt_out.default === true,
+    default_join_ping_cooldown: Number(
+      guildConfigTable.default_join_ping_cooldown.default,
+    ),
+  }
+
+  const maxCooldown = ServerMaxJoinPingCooldown.build([
+    config.max_join_ping_cooldown.toString() as "0",
+  ])
+  if (config.allow_join_opt_out) {
+    maxCooldown.disabled = true
+  }
+
+  return {
+    components: [
+      d.row(
+        ServerJoinPingOptOut.build([
+          config.allow_join_opt_out === true ? "true" : "false",
+        ]),
+      ),
+      d.row(
+        ServerDefaultJoinPingCooldown.build([
+          config.default_join_ping_cooldown.toString() as "0",
+        ]),
+      ),
+      d.row(maxCooldown),
+    ],
+  }
+}
+
+export function serverStreamingPingSettings(
+  config?: Pick<
+    typeof guildConfigTable.$inferSelect,
+    | "max_streaming_ping_cooldown"
+    | "allow_streaming_opt_out"
+    | "default_streaming_ping_cooldown"
+  >,
+) {
+  config ??= {
+    max_streaming_ping_cooldown: Number(
+      guildConfigTable.max_streaming_ping_cooldown.default,
+    ),
+    allow_streaming_opt_out:
+      guildConfigTable.allow_streaming_opt_out.default === true,
+    default_streaming_ping_cooldown: Number(
+      guildConfigTable.default_streaming_ping_cooldown.default,
+    ),
+  }
+
+  const maxCooldown = ServerMaxStreamingPingCooldown.build([
+    config.max_streaming_ping_cooldown.toString() as "0",
+  ])
+  if (config.allow_streaming_opt_out) {
+    maxCooldown.disabled = true
+  }
+
+  return {
+    components: [
+      d.row(
+        ServerStreamingPingOptOut.build([
+          config.allow_streaming_opt_out === true ? "true" : "false",
+        ]),
+      ),
+      d.row(
+        ServerDefaultStreamingPingCooldown.build([
+          config.default_streaming_ping_cooldown.toString() as "0",
+        ]),
+      ),
+      d.row(maxCooldown),
+    ],
   }
 }
 

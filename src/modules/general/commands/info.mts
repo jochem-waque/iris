@@ -7,7 +7,8 @@
 import { EmbedBuilder, MessageFlags } from "discord.js"
 import d from "fluent-commands"
 import { Reactions } from "../../reactions/commands/reactions.mjs"
-import { TogglePings } from "../../voice/commands/togglePings.mjs"
+import { Pings } from "../../voice/commands/pings.mjs"
+import { Server } from "../../voice/commands/server.mjs"
 
 export const Info = d
   .slashCommand("info", "Displays information about the bot")
@@ -41,11 +42,15 @@ If these reactions weren't supposed to be added to your message, you can right c
               name: "Voice topics",
               value: `If you are a desktop Discord user, you should be familiar with the voice channel topic feature. This feature allows you to label voice channels with what's currently happening. For people with voice accessibility features on their devices, or even neurodivergent people, it's sometimes hard to gauge what's going on in a voice channel if the topic isn't set. Taking the time to set a clear channel topic will allow people with problems on that spectrum to more comfortably be able to join a voice channel.
 
-When you join a voice channel, the bot will remind you to set the channel topic. You can opt out from this feature using ${TogglePings.id ? `</${TogglePings.name} toggle:${TogglePings.id}>` : "/toggle pings"}.
+When you join a voice channel, the bot will remind you to set the channel topic.
 
-If you begin streaming in a voice channel, you will be reminded once more to set the channel topic. This feature cannot be opted out of.
+If you begin streaming in a voice channel, you will be reminded once more to set the channel topic.
 
 The message sent by the bot contains dropdowns to help you easily set an appropriate channel topic. You are not required to use these dropdowns, and can manually set the topic if you want.`,
+            },
+            {
+              name: "Ping configuration",
+              value: `Pings can be configured using the ${Pings.id ? `</${Pings.name} configure:${Pings.id}>` : "/pings configure"} command. Server owners can change settings for their server using ${Server.id ? `</${Server.name} pings:${Server.id}>` : "/server pings"}.`,
             },
           ),
       ],
