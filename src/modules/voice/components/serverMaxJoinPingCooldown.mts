@@ -47,7 +47,8 @@ export const ServerMaxJoinPingCooldown = d
           default_streaming_ping_cooldown: old?.default_streaming_ping_cooldown,
           max_join_ping_cooldown: number,
           default_join_ping_cooldown: Math.min(
-            old?.default_join_ping_cooldown ?? 0,
+            old?.default_join_ping_cooldown ??
+              Number(guildConfigTable.default_join_ping_cooldown.default),
             number,
           ),
         })

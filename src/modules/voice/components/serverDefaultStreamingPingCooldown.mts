@@ -48,7 +48,8 @@ export const ServerDefaultStreamingPingCooldown = d
           default_streaming_ping_cooldown: number,
           max_streaming_ping_cooldown: Math.max(
             number,
-            old?.max_streaming_ping_cooldown ?? 0,
+            old?.max_streaming_ping_cooldown ??
+              Number(guildConfigTable.max_streaming_ping_cooldown.default),
           ),
         })
         .returning()
