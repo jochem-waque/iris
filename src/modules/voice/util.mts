@@ -373,27 +373,14 @@ export async function conditionallyUpdateStatus(
 }
 
 export function serverJoinPingSettings(
-  config?: Pick<
-    typeof guildConfigTable.$inferSelect,
-    | "max_join_ping_cooldown"
-    | "allow_join_opt_out"
-    | "default_join_ping_cooldown"
-  >,
+  config?: typeof guildConfigTable.$inferSelect,
 ) {
-  config ??= {
-    max_join_ping_cooldown: Number(
-      guildConfigTable.max_join_ping_cooldown.default,
-    ),
-    allow_join_opt_out: guildConfigTable.allow_join_opt_out.default === true,
-    default_join_ping_cooldown: Number(
-      guildConfigTable.default_join_ping_cooldown.default,
-    ),
-  }
+  const { guild } = joinPings(config)
 
   const maxCooldown = ServerMaxJoinPingCooldown.build([
-    config.max_join_ping_cooldown.toString() as "0",
+    guild.maxCooldown.toString() as "0",
   ])
-  if (config.allow_join_opt_out) {
+  if (guild.allowOptOut) {
     maxCooldown.disabled = true
   }
 
@@ -401,12 +388,12 @@ export function serverJoinPingSettings(
     components: [
       d.row(
         ServerJoinPingOptOut.build([
-          config.allow_join_opt_out === true ? "true" : "false",
+          guild.allowOptOut === true ? "true" : "false",
         ]),
       ),
       d.row(
         ServerDefaultJoinPingCooldown.build([
-          config.default_join_ping_cooldown.toString() as "0",
+          guild.defaultCooldown.toString() as "0",
         ]),
       ),
       d.row(maxCooldown),
@@ -415,28 +402,14 @@ export function serverJoinPingSettings(
 }
 
 export function serverStreamingPingSettings(
-  config?: Pick<
-    typeof guildConfigTable.$inferSelect,
-    | "max_streaming_ping_cooldown"
-    | "allow_streaming_opt_out"
-    | "default_streaming_ping_cooldown"
-  >,
+  config?: typeof guildConfigTable.$inferSelect,
 ) {
-  config ??= {
-    max_streaming_ping_cooldown: Number(
-      guildConfigTable.max_streaming_ping_cooldown.default,
-    ),
-    allow_streaming_opt_out:
-      guildConfigTable.allow_streaming_opt_out.default === true,
-    default_streaming_ping_cooldown: Number(
-      guildConfigTable.default_streaming_ping_cooldown.default,
-    ),
-  }
+  const { guild } = streamingPings(config)
 
   const maxCooldown = ServerMaxStreamingPingCooldown.build([
-    config.max_streaming_ping_cooldown.toString() as "0",
+    guild.maxCooldown.toString() as "0",
   ])
-  if (config.allow_streaming_opt_out) {
+  if (guild.allowOptOut) {
     maxCooldown.disabled = true
   }
 
@@ -444,12 +417,12 @@ export function serverStreamingPingSettings(
     components: [
       d.row(
         ServerStreamingPingOptOut.build([
-          config.allow_streaming_opt_out === true ? "true" : "false",
+          guild.allowOptOut === true ? "true" : "false",
         ]),
       ),
       d.row(
         ServerDefaultStreamingPingCooldown.build([
-          config.default_streaming_ping_cooldown.toString() as "0",
+          guild.defaultCooldown.toString() as "0",
         ]),
       ),
       d.row(maxCooldown),
