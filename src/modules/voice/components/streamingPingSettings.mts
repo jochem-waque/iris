@@ -64,6 +64,10 @@ export const StreamingPingSettings = d
             }
 
             cooldown = Math.min(cooldown, guild.maxCooldown)
+            if (cooldown === 0) {
+              disabled = false
+              cooldown = undefined
+            }
         }
 
         const [memberConfig] = await tx
