@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm"
+import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { guildConfigTable, memberConfigTable } from "../../../schema.mjs"
@@ -31,7 +31,12 @@ export const StreamingPingSettings = d
 
     const [oldMemberConfig] = await Database.select()
       .from(memberConfigTable)
-      .where(eq(memberConfigTable.guild_id, interaction.guildId))
+      .where(
+        and(
+          eq(memberConfigTable.guild_id, interaction.guildId),
+          eq(memberConfigTable.user_id, interaction.user.id),
+        ),
+      )
       .orderBy(desc(memberConfigTable.timestamp))
       .limit(1)
 
