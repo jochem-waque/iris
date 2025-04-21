@@ -40,10 +40,11 @@ export const ServerDefaultStreamingPingCooldown = d
       return await tx
         .insert(guildConfigTable)
         .values({
-          ...old,
-          id: undefined,
-          timestamp: undefined,
           guild_id: interaction.guildId,
+          allow_join_opt_out: old?.allow_join_opt_out,
+          max_join_ping_cooldown: old?.max_join_ping_cooldown,
+          default_join_ping_cooldown: old?.default_join_ping_cooldown,
+          allow_streaming_opt_out: old?.allow_streaming_opt_out,
           default_streaming_ping_cooldown: number,
           max_streaming_ping_cooldown: Math.max(
             number,
