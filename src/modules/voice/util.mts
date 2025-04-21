@@ -122,9 +122,10 @@ export async function voiceStatus({
       source === "join"
         ? joinPings(guildConfig, memberConfig)
         : streamingPings(guildConfig, memberConfig)
-    switch (source) {
-      case "join":
-        if (typeof member === "number") {
+
+    if (typeof member === "number") {
+      switch (source) {
+        case "join":
           JoinCooldowns.add(key)
           setTimeout(
             () => {
@@ -132,11 +133,9 @@ export async function voiceStatus({
             },
             member * 60 * 1000,
           )
-        }
 
-        break
-      case "streaming":
-        if (typeof member === "number") {
+          break
+        case "streaming":
           StreamingCooldowns.add(key)
           setTimeout(
             () => {
@@ -144,9 +143,9 @@ export async function voiceStatus({
             },
             member * 60 * 1000,
           )
-        }
 
-        break
+          break
+      }
     }
   }
 
