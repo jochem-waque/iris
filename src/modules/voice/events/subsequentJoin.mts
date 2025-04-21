@@ -41,15 +41,6 @@ export const SubsequentJoin = d
       return
     }
 
-    // const [noPing] = await Database.select()
-    //   .from(joinPingsTable)
-    //   .where(eq(joinPingsTable.user_id, newState.id))
-    //   .limit(1)
-
-    // if (noPing) {
-    //   return
-    // }
-
     const voiceChannel = newState.channel
     const options: VoiceStatusMessageOptions = {
       source: "join",
