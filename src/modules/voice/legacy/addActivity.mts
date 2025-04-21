@@ -41,6 +41,7 @@ export const AddActivity = modal({
     }
 
     const { messageOptions, status, channelId } = await voiceStatus({
+      force: true,
       activity: newActivity.id.toString(),
       oldMessage: interaction.message,
       guild: interaction.guild,

@@ -8,7 +8,7 @@ import { ChannelType } from "discord.js"
 import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
-import { joinPingsTable, messageTable } from "../../../schema.mjs"
+import { messageTable } from "../../../schema.mjs"
 import {
   fetchOldMessage,
   getTextChannel,
@@ -41,41 +41,41 @@ export const SubsequentJoin = d
       return
     }
 
-    const [noPing] = await Database.select()
-      .from(joinPingsTable)
-      .where(eq(joinPingsTable.user_id, newState.id))
-      .limit(1)
-
-    if (noPing) {
-      return
-    }
-
-    const [old] = await Database.delete(messageTable)
-      .where(eq(messageTable.voice_id, newState.channel.id))
-      .returning()
-
+    const voiceChannel = newState.channel
     const options: VoiceStatusMessageOptions = {
-      voiceId: newState.channel.id,
+      source: "join",
+      voiceId: voiceChannel.id,
       guild: newState.guild,
       mention: newState.id,
     }
 
-    const oldMessage = await fetchOldMessage(newState.guild, old)
-    if (oldMessage) {
-      options.oldMessage = oldMessage
-    }
+    await Database.transaction(async (tx) => {
+      const [old] = await tx
+        .delete(messageTable)
+        .where(eq(messageTable.voice_id, voiceChannel.id))
+        .returning()
 
-    const { messageOptions } = await voiceStatus(options)
+      const oldMessage = await fetchOldMessage(newState.guild, old)
+      if (oldMessage) {
+        options.oldMessage = oldMessage
+      }
 
-    const channel = await getTextChannel(newState.channel)
+      const { messageOptions } = await voiceStatus(options)
+      if (!messageOptions) {
+        tx.rollback()
+        return
+      }
 
-    const message = await channel.send(messageOptions)
+      const channel = await getTextChannel(voiceChannel)
 
-    await Database.insert(messageTable).values({
-      channel_id: message.channelId,
-      message_id: message.id,
-      voice_id: newState.channel.id,
+      const message = await channel.send(messageOptions)
+
+      await tx.insert(messageTable).values({
+        channel_id: message.channelId,
+        message_id: message.id,
+        voice_id: voiceChannel.id,
+      })
+
+      await oldMessage?.delete()
     })
-
-    await oldMessage?.delete()
   })

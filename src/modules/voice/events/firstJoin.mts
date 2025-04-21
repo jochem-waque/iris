@@ -41,24 +41,31 @@ export const FirstJoin = d
     }
 
     const { messageOptions } = await voiceStatus({
+      source: "join",
+      force: true,
       voiceId: newState.channel.id,
       guild: newState.guild,
       mention: newState.id,
     })
 
-    const channel = await getTextChannel(newState.channel)
+    const voiceChannel = newState.channel
 
-    const message = await channel.send(messageOptions)
+    const channel = await getTextChannel(voiceChannel)
 
-    const [old] = await Database.delete(messageTable)
-      .where(eq(messageTable.voice_id, newState.channel.id))
-      .returning()
+    await Database.transaction(async (tx) => {
+      const [old] = await tx
+        .delete(messageTable)
+        .where(eq(messageTable.voice_id, voiceChannel.id))
+        .returning()
 
-    await Database.insert(messageTable).values({
-      channel_id: message.channelId,
-      message_id: message.id,
-      voice_id: newState.channel.id,
+      const message = await channel.send(messageOptions)
+
+      await tx.insert(messageTable).values({
+        channel_id: message.channelId,
+        message_id: message.id,
+        voice_id: voiceChannel.id,
+      })
+
+      await deleteOldMessage(channel.guild, old)
     })
-
-    await deleteOldMessage(channel.guild, old)
   })

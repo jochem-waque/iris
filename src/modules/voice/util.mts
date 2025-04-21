@@ -22,16 +22,33 @@ import {
   VoiceBasedChannel,
   VoiceState,
 } from "discord.js"
-import { desc, eq } from "drizzle-orm"
+import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Blacklist } from "../../blacklist.mjs"
 import { Database } from "../../index.mjs"
-import { activitiesTable, linkTable, messageTable } from "../../schema.mjs"
+import {
+  activitiesTable,
+  guildConfigTable,
+  linkTable,
+  memberConfigTable,
+  messageTable,
+} from "../../schema.mjs"
+import { joinPings, streamingPings } from "./commands/pings.mjs"
 import { ActivityDropdown } from "./components/activityDropdown.mjs"
 import { NoiseDropdown } from "./components/noiseDropdown.mjs"
+import { ServerDefaultJoinPingCooldown } from "./components/serverDefaultJoinPingCooldown.mjs"
+import { ServerDefaultStreamingPingCooldown } from "./components/serverDefaultStreamingPingCooldown.mjs"
+import { ServerJoinPingOptOut } from "./components/serverJoinPingOptOut.mjs"
+import { ServerMaxJoinPingCooldown } from "./components/serverMaxJoinPingCooldown.mjs"
+import { ServerMaxStreamingPingCooldown } from "./components/serverMaxStreamingPingCooldown.mjs"
+import { ServerStreamingPingOptOut } from "./components/serverStreamingPingOptOut.mjs"
+
+const JoinCooldowns = new Set<string>()
+const StreamingCooldowns = new Set<string>()
 
 export type VoiceStatusMessageOptions = {
   guild: Guild
+  source?: "streaming" | "join"
   voiceId?: Snowflake
   activity?: string
   noise?: string
@@ -39,22 +56,103 @@ export type VoiceStatusMessageOptions = {
   mention?: Snowflake
 }
 
+type VoiceStatus = {
+  messageOptions: InteractionUpdateOptions & MessageCreateOptions
+  status: string | null
+  channelId: string | undefined
+}
+
+export async function voiceStatus(
+  options: VoiceStatusMessageOptions,
+): Promise<Partial<VoiceStatus>>
+export async function voiceStatus(
+  options: VoiceStatusMessageOptions & { force: true },
+): Promise<VoiceStatus>
 export async function voiceStatus({
+  force,
   voiceId,
   guild,
   activity,
   noise,
   oldMessage,
   mention,
-}: VoiceStatusMessageOptions) {
+  source,
+}: VoiceStatusMessageOptions & { force?: true }) {
+  const key = `${guild.id}-${mention}`
+  if (mention && source) {
+    if (
+      (source === "join" && JoinCooldowns.has(key)) ||
+      (source === "streaming" && StreamingCooldowns.has(key))
+    ) {
+      mention = undefined
+    }
+  }
+
+  if (!force && (!mention || Blacklist.has(mention))) {
+    return {}
+  }
+
+  if (mention) {
+    const [guildConfig, memberConfig] = await Database.transaction(
+      async (tx) => {
+        const [guildConfig] = await tx
+          .select()
+          .from(guildConfigTable)
+          .where(eq(guildConfigTable.guild_id, guild.id))
+          .orderBy(desc(guildConfigTable.timestamp))
+          .limit(1)
+
+        const [memberConfig] = await tx
+          .select()
+          .from(memberConfigTable)
+          .where(
+            and(
+              eq(memberConfigTable.guild_id, guild.id),
+              eq(memberConfigTable.user_id, mention),
+            ),
+          )
+          .orderBy(desc(memberConfigTable.timestamp))
+          .limit(1)
+
+        return [guildConfig, memberConfig]
+      },
+    )
+
+    const { member } =
+      source === "join"
+        ? joinPings(guildConfig, memberConfig)
+        : streamingPings(guildConfig, memberConfig)
+    switch (source) {
+      case "join":
+        if (typeof member === "number") {
+          JoinCooldowns.add(key)
+          setTimeout(
+            () => {
+              JoinCooldowns.delete(key)
+            },
+            member * 60 * 1000,
+          )
+        }
+
+        break
+      case "streaming":
+        if (typeof member === "number") {
+          StreamingCooldowns.add(key)
+          setTimeout(
+            () => {
+              StreamingCooldowns.delete(key)
+            },
+            member * 60 * 1000,
+          )
+        }
+
+        break
+    }
+  }
+
   activity ??= selectedValue(oldMessage?.components[0]?.components[0]?.data)
   noise ??= selectedValue(oldMessage?.components[1]?.components[0]?.data)
   voiceId ??= oldMessage?.embeds[0]?.fields[0]?.value.slice(2, -1)
-
-  // TODO resending the message isn't *really* necessary if no one gets mentioned
-  if (mention && Blacklist.has(mention)) {
-    mention = undefined
-  }
 
   const activities = await Database.select()
     .from(activitiesTable)
@@ -271,6 +369,64 @@ export async function conditionallyUpdateStatus(
   const channel = await interaction.guild.channels.fetch(channelId)
   if (channel?.isVoiceBased()) {
     await setVoiceChannelStatus(channel, status)
+  }
+}
+
+export function serverJoinPingSettings(
+  config?: typeof guildConfigTable.$inferSelect,
+) {
+  const { guild } = joinPings(config)
+
+  const maxCooldown = ServerMaxJoinPingCooldown.build([
+    guild.maxCooldown.toString() as "0",
+  ])
+  if (guild.allowOptOut) {
+    maxCooldown.disabled = true
+  }
+
+  return {
+    components: [
+      d.row(
+        ServerJoinPingOptOut.build([
+          guild.allowOptOut === true ? "true" : "false",
+        ]),
+      ),
+      d.row(
+        ServerDefaultJoinPingCooldown.build([
+          guild.defaultCooldown.toString() as "0",
+        ]),
+      ),
+      d.row(maxCooldown),
+    ],
+  }
+}
+
+export function serverStreamingPingSettings(
+  config?: typeof guildConfigTable.$inferSelect,
+) {
+  const { guild } = streamingPings(config)
+
+  const maxCooldown = ServerMaxStreamingPingCooldown.build([
+    guild.maxCooldown.toString() as "0",
+  ])
+  if (guild.allowOptOut) {
+    maxCooldown.disabled = true
+  }
+
+  return {
+    components: [
+      d.row(
+        ServerStreamingPingOptOut.build([
+          guild.allowOptOut === true ? "true" : "false",
+        ]),
+      ),
+      d.row(
+        ServerDefaultStreamingPingCooldown.build([
+          guild.defaultCooldown.toString() as "0",
+        ]),
+      ),
+      d.row(maxCooldown),
+    ],
   }
 }
 

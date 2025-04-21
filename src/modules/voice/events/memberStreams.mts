@@ -36,32 +36,41 @@ export const MemberStreams = d
       return
     }
 
+    const voiceChannel = newState.channel
     const options: VoiceStatusMessageOptions = {
-      voiceId: newState.channel.id,
+      source: "streaming",
+      voiceId: voiceChannel.id,
       guild: newState.guild,
       mention: newState.id,
     }
 
-    const [old] = await Database.delete(messageTable)
-      .where(eq(messageTable.voice_id, newState.channel.id))
-      .returning()
+    await Database.transaction(async (tx) => {
+      const [old] = await tx
+        .delete(messageTable)
+        .where(eq(messageTable.voice_id, voiceChannel.id))
+        .returning()
 
-    const oldMessage = await fetchOldMessage(newState.guild, old)
-    if (oldMessage) {
-      options.oldMessage = oldMessage
-    }
+      const oldMessage = await fetchOldMessage(newState.guild, old)
+      if (oldMessage) {
+        options.oldMessage = oldMessage
+      }
 
-    const { messageOptions } = await voiceStatus(options)
+      const { messageOptions } = await voiceStatus(options)
+      if (!messageOptions) {
+        tx.rollback()
+        return
+      }
 
-    const channel = await getTextChannel(newState.channel)
+      const channel = await getTextChannel(voiceChannel)
 
-    const message = await channel.send(messageOptions)
+      const message = await channel.send(messageOptions)
 
-    await Database.insert(messageTable).values({
-      channel_id: message.channelId,
-      message_id: message.id,
-      voice_id: newState.channel.id,
+      await tx.insert(messageTable).values({
+        channel_id: message.channelId,
+        message_id: message.id,
+        voice_id: voiceChannel.id,
+      })
+
+      await oldMessage?.delete()
     })
-
-    await oldMessage?.delete()
   })
