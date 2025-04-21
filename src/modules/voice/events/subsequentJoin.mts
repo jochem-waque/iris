@@ -52,6 +52,7 @@ export const SubsequentJoin = d
 
     const voiceChannel = newState.channel
     const options: VoiceStatusMessageOptions = {
+      source: "join",
       voiceId: voiceChannel.id,
       guild: newState.guild,
       mention: newState.id,

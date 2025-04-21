@@ -41,6 +41,7 @@ export const FirstJoin = d
     }
 
     const { messageOptions } = await voiceStatus({
+      source: "join",
       force: true,
       voiceId: newState.channel.id,
       guild: newState.guild,

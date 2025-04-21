@@ -38,6 +38,7 @@ export const MemberStreams = d
 
     const voiceChannel = newState.channel
     const options: VoiceStatusMessageOptions = {
+      source: "streaming",
       voiceId: voiceChannel.id,
       guild: newState.guild,
       mention: newState.id,
