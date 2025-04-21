@@ -24,53 +24,64 @@ export const JoinPingSettings = d
       return
     }
 
-    const [guildConfig] = await Database.select()
-      .from(guildConfigTable)
-      .where(eq(guildConfigTable.guild_id, interaction.guildId))
-      .orderBy(desc(guildConfigTable.timestamp))
-      .limit(1)
+    const [guildConfig, memberConfig] = await Database.transaction(
+      async (tx) => {
+        const [guildConfig] = await tx
+          .select()
+          .from(guildConfigTable)
+          .where(eq(guildConfigTable.guild_id, interaction.guildId))
+          .orderBy(desc(guildConfigTable.timestamp))
+          .limit(1)
 
-    const [oldMemberConfig] = await Database.select()
-      .from(memberConfigTable)
-      .where(
-        and(
-          eq(memberConfigTable.guild_id, interaction.guildId),
-          eq(memberConfigTable.user_id, interaction.user.id),
-        ),
-      )
-      .orderBy(desc(memberConfigTable.timestamp))
-      .limit(1)
+        const { guild } = joinPings(guildConfig)
 
-    const { guild } = joinPings(guildConfig)
-    if (value === "false" && !guild.allowOptOut) {
-      await interaction.update({
-        components: [d.row(joinPingSettings(guildConfig, oldMemberConfig))],
-      })
-      return
-    }
+        const [oldMemberConfig] = await tx
+          .select()
+          .from(memberConfigTable)
+          .where(
+            and(
+              eq(memberConfigTable.guild_id, interaction.guildId),
+              eq(memberConfigTable.user_id, interaction.user.id),
+            ),
+          )
+          .orderBy(desc(memberConfigTable.timestamp))
+          .limit(1)
 
-    let cooldown: number | undefined = parseInt(value)
-    if (isNaN(cooldown)) {
-      cooldown = undefined
-    }
+        let disabled: boolean | undefined
+        let cooldown: number | undefined
 
-    if (cooldown !== undefined && cooldown > guild.maxCooldown) {
-      await interaction.update({
-        components: [d.row(joinPingSettings(guildConfig, oldMemberConfig))],
-      })
-      return
-    }
+        switch (true) {
+          case value === "true":
+            disabled = false
+            break
+          case value === "false" && guild.allowOptOut:
+            disabled = true
+            break
+          default:
+            cooldown = parseInt(value)
+            if (isNaN(cooldown)) {
+              cooldown = undefined
+              break
+            }
 
-    const [memberConfig] = await Database.insert(memberConfigTable)
-      .values({
-        user_id: interaction.user.id,
-        guild_id: interaction.guild.id,
-        disable_streaming_pings: oldMemberConfig?.disable_streaming_pings,
-        streaming_ping_cooldown: oldMemberConfig?.streaming_ping_cooldown,
-        disable_join_pings: value === "false",
-        join_ping_cooldown: cooldown,
-      })
-      .returning()
+            cooldown = Math.min(cooldown, guild.maxCooldown)
+        }
+
+        const [memberConfig] = await tx
+          .insert(memberConfigTable)
+          .values({
+            user_id: interaction.user.id,
+            guild_id: interaction.guild.id,
+            disable_streaming_pings: oldMemberConfig?.disable_streaming_pings,
+            streaming_ping_cooldown: oldMemberConfig?.streaming_ping_cooldown,
+            disable_join_pings: disabled,
+            join_ping_cooldown: cooldown,
+          })
+          .returning()
+
+        return [guildConfig, memberConfig]
+      },
+    )
 
     await interaction.update({
       components: [d.row(joinPingSettings(guildConfig, memberConfig))],

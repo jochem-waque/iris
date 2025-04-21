@@ -122,6 +122,10 @@ export function joinPings(
 
   guild.defaultCooldown = Math.min(guild.defaultCooldown, guild.maxCooldown)
 
+  if (memberConfig?.disable_join_pings === false) {
+    return { guild, member: true }
+  }
+
   if (memberConfig?.disable_join_pings && guild.allowOptOut) {
     return { guild, member: false }
   }
@@ -166,6 +170,10 @@ export function streamingPings(
   }
 
   guild.defaultCooldown = Math.min(guild.defaultCooldown, guild.maxCooldown)
+
+  if (memberConfig?.disable_streaming_pings === false) {
+    return { guild, member: true }
+  }
 
   if (memberConfig?.disable_streaming_pings && guild.allowOptOut) {
     return { guild, member: false }
