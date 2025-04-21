@@ -5,8 +5,8 @@
  */
 
 import { GatewayIntentBits, Partials } from "discord.js"
-import { drizzle } from "drizzle-orm/libsql"
-import { migrate } from "drizzle-orm/libsql/migrator"
+import { drizzle } from "drizzle-orm/better-sqlite3"
+import { migrate } from "drizzle-orm/better-sqlite3/migrator"
 import d from "fluent-commands"
 import { General } from "./modules/general/general.mjs"
 import { Reactions } from "./modules/reactions/reactions.mjs"
@@ -15,7 +15,7 @@ import { Env } from "./variables.mjs"
 
 export const Database = drizzle(Env.dbFileName)
 
-await migrate(Database, { migrationsFolder: "./drizzle" })
+migrate(Database, { migrationsFolder: "./drizzle" })
 
 const bot = d
   .bot({
