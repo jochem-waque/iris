@@ -22,22 +22,30 @@ export const Pings = d
           return
         }
 
-        const [guildConfig] = await Database.select()
-          .from(guildConfigTable)
-          .where(eq(guildConfigTable.guild_id, interaction.guildId))
-          .orderBy(desc(guildConfigTable.timestamp))
-          .limit(1)
+        const [guildConfig, memberConfig] = await Database.transaction(
+          async (tx) => {
+            const [guildConfig] = await tx
+              .select()
+              .from(guildConfigTable)
+              .where(eq(guildConfigTable.guild_id, interaction.guildId))
+              .orderBy(desc(guildConfigTable.timestamp))
+              .limit(1)
 
-        const [memberConfig] = await Database.select()
-          .from(memberConfigTable)
-          .where(
-            and(
-              eq(memberConfigTable.guild_id, interaction.guildId),
-              eq(memberConfigTable.user_id, interaction.user.id),
-            ),
-          )
-          .orderBy(desc(memberConfigTable.timestamp))
-          .limit(1)
+            const [memberConfig] = await tx
+              .select()
+              .from(memberConfigTable)
+              .where(
+                and(
+                  eq(memberConfigTable.guild_id, interaction.guildId),
+                  eq(memberConfigTable.user_id, interaction.user.id),
+                ),
+              )
+              .orderBy(desc(memberConfigTable.timestamp))
+              .limit(1)
+
+            return [guildConfig, memberConfig]
+          },
+        )
 
         await interaction.reply({
           flags: MessageFlags.Ephemeral,

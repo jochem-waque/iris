@@ -93,22 +93,30 @@ export async function voiceStatus({
   }
 
   if (mention) {
-    const [guildConfig] = await Database.select()
-      .from(guildConfigTable)
-      .where(eq(guildConfigTable.guild_id, guild.id))
-      .orderBy(desc(guildConfigTable.timestamp))
-      .limit(1)
+    const [guildConfig, memberConfig] = await Database.transaction(
+      async (tx) => {
+        const [guildConfig] = await tx
+          .select()
+          .from(guildConfigTable)
+          .where(eq(guildConfigTable.guild_id, guild.id))
+          .orderBy(desc(guildConfigTable.timestamp))
+          .limit(1)
 
-    const [memberConfig] = await Database.select()
-      .from(memberConfigTable)
-      .where(
-        and(
-          eq(memberConfigTable.guild_id, guild.id),
-          eq(memberConfigTable.user_id, mention),
-        ),
-      )
-      .orderBy(desc(memberConfigTable.timestamp))
-      .limit(1)
+        const [memberConfig] = await tx
+          .select()
+          .from(memberConfigTable)
+          .where(
+            and(
+              eq(memberConfigTable.guild_id, guild.id),
+              eq(memberConfigTable.user_id, mention),
+            ),
+          )
+          .orderBy(desc(memberConfigTable.timestamp))
+          .limit(1)
+
+        return [guildConfig, memberConfig]
+      },
+    )
 
     const { member } =
       source === "join"
