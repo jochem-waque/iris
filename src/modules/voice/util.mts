@@ -88,7 +88,7 @@ export async function voiceStatus({
     }
   }
 
-  if (!mention || Blacklist.has(mention) || !force) {
+  if (!force && (!mention || Blacklist.has(mention))) {
     return {}
   }
 
