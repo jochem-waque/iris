@@ -79,6 +79,11 @@ export async function voiceStatus({
   source,
 }: VoiceStatusMessageOptions & { force?: true }) {
   const key = `${guild.id}-${mention}`
+
+  if (mention && Blacklist.has(mention)) {
+    mention = undefined
+  }
+
   if (mention && source) {
     if (
       (source === "join" && JoinCooldowns.has(key)) ||
@@ -88,7 +93,7 @@ export async function voiceStatus({
     }
   }
 
-  if (!force && (!mention || Blacklist.has(mention))) {
+  if (!force && !mention) {
     return {}
   }
 
