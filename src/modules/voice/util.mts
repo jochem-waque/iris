@@ -11,8 +11,6 @@ import {
   ComponentType,
   DiscordAPIError,
   Guild,
-  heading,
-  HeadingLevel,
   InteractionUpdateOptions,
   Message,
   MessageCreateOptions,
@@ -206,21 +204,15 @@ export async function voiceStatus({
     components: [
       d
         .container(
-          d.text(heading("Voice channel topic")),
-          d.text(
-            "Please make sure that the activity and noise level that you select are representative of what is happening in the VC, and not relevant to just you or your stream.",
-          ),
-          d.text(heading("Channel", HeadingLevel.Two)),
+          d.text(`# Voice channel topic
+Please make sure that the activity and noise level that you select are representative of what is happening in the VC, and not relevant to just you or your stream.${mention ? `\n${userMention(mention)}` : ""}
+## Channel`),
           d.text(channelMention(voiceId ?? "")).id(1),
           d.row(activityDropdown),
           d.row(noiseDropdown),
         )
         .build(),
     ],
-  }
-
-  if (mention) {
-    messageOptions.content = `\n${userMention(mention)}`
   }
 
   return {
