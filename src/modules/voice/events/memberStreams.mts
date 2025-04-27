@@ -46,9 +46,9 @@ export const MemberStreams = d
 
     await Database.transaction(async (tx) => {
       const [old] = await tx
-        .delete(messageTable)
+        .select()
+        .from(messageTable)
         .where(eq(messageTable.voice_id, voiceChannel.id))
-        .returning()
 
       const oldMessage = await fetchOldMessage(newState.guild, old)
       if (oldMessage) {
@@ -57,13 +57,16 @@ export const MemberStreams = d
 
       const { messageOptions } = await voiceStatus(options)
       if (!messageOptions) {
-        tx.rollback()
         return
       }
 
       const channel = await getTextChannel(voiceChannel)
 
       const message = await channel.send(messageOptions)
+
+      await tx
+        .delete(messageTable)
+        .where(eq(messageTable.voice_id, voiceChannel.id))
 
       await tx.insert(messageTable).values({
         channel_id: message.channelId,
