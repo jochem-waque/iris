@@ -10,14 +10,17 @@ import {
   channelMention,
   ComponentType,
   DiscordAPIError,
-  EmbedBuilder,
   Guild,
+  heading,
+  HeadingLevel,
   InteractionUpdateOptions,
   Message,
   MessageCreateOptions,
+  MessageFlags,
   RESTJSONErrorCodes,
   Snowflake,
   StringSelectMenuOptionBuilder,
+  TopLevelComponent,
   userMention,
   VoiceBasedChannel,
   VoiceState,
@@ -154,11 +157,17 @@ export async function voiceStatus({
     }
   }
 
+  // FIXME wait for discord.js fix
   activity ??= selectedValue(
-    oldMessage?.resolveComponent(ActivityDropdown.id)?.data,
+    findComponentByCustomId(oldMessage?.components ?? [], ActivityDropdown.id),
   )
-  noise ??= selectedValue(oldMessage?.resolveComponent(NoiseDropdown.id)?.data)
-  voiceId ??= oldMessage?.embeds[0]?.fields[0]?.value.slice(2, -1)
+  noise ??= selectedValue(
+    findComponentByCustomId(oldMessage?.components ?? [], NoiseDropdown.id),
+  )
+  voiceId ??= text(findComponentById(oldMessage?.components ?? [], 1))?.slice(
+    2,
+    -1,
+  )
 
   const activities = await Database.select()
     .from(activitiesTable)
@@ -192,19 +201,22 @@ export async function voiceStatus({
     currentNoise.setDefault(true)
   }
 
-  const embed = new EmbedBuilder()
-    .setTitle("Voice channel topic")
-    .setDescription(
-      "Please make sure that the activity and noise level that you select are representative of what is happening in the VC, and not relevant to just you or your stream.",
-    )
-
-  if (voiceId) {
-    embed.setFields({ name: "Channel", value: channelMention(voiceId) })
-  }
-
-  const messageOptions: InteractionUpdateOptions & MessageCreateOptions = {
-    components: [d.row(activityDropdown).build(), d.row(noiseDropdown).build()],
-    embeds: [embed],
+  const messageOptions: MessageCreateOptions = {
+    flags: MessageFlags.IsComponentsV2,
+    components: [
+      d
+        .container(
+          d.text(heading("Voice channel topic")),
+          d.text(
+            "Please make sure that the activity and noise level that you select are representative of what is happening in the VC, and not relevant to just you or your stream.",
+          ),
+          d.text(heading("Channel", HeadingLevel.Two)),
+          d.text(channelMention(voiceId ?? "")).id(1),
+          d.row(activityDropdown),
+          d.row(noiseDropdown),
+        )
+        .build(),
+    ],
   }
 
   if (mention) {
@@ -391,25 +403,19 @@ export function serverJoinPingSettings(
     maxCooldown.setDisabled(true)
   }
 
-  return {
-    components: [
-      d
-        .row(
-          ServerJoinPingOptOut.with([
-            guild.allowOptOut === true ? "true" : "false",
-          ]),
-        )
-        .build(),
-      d
-        .row(
-          ServerDefaultJoinPingCooldown.with([
-            guild.defaultCooldown.toString() as "0",
-          ]),
-        )
-        .build(),
-      d.row(maxCooldown).build(),
-    ],
-  }
+  return [
+    d.row(
+      ServerJoinPingOptOut.with([
+        guild.allowOptOut === true ? "true" : "false",
+      ]),
+    ),
+    d.row(
+      ServerDefaultJoinPingCooldown.with([
+        guild.defaultCooldown.toString() as "0",
+      ]),
+    ),
+    d.row(maxCooldown),
+  ]
 }
 
 export function serverStreamingPingSettings(
@@ -424,25 +430,19 @@ export function serverStreamingPingSettings(
     maxCooldown.setDisabled(true)
   }
 
-  return {
-    components: [
-      d
-        .row(
-          ServerStreamingPingOptOut.with([
-            guild.allowOptOut === true ? "true" : "false",
-          ]),
-        )
-        .build(),
-      d
-        .row(
-          ServerDefaultStreamingPingCooldown.with([
-            guild.defaultCooldown.toString() as "0",
-          ]),
-        )
-        .build(),
-      d.row(maxCooldown).build(),
-    ],
-  }
+  return [
+    d.row(
+      ServerStreamingPingOptOut.with([
+        guild.allowOptOut === true ? "true" : "false",
+      ]),
+    ),
+    d.row(
+      ServerDefaultStreamingPingCooldown.with([
+        guild.defaultCooldown.toString() as "0",
+      ]),
+    ),
+    d.row(maxCooldown),
+  ]
 }
 
 function formatOption(option?: StringSelectMenuOptionBuilder) {
@@ -468,4 +468,44 @@ function selectedValue(component?: AnyComponent) {
   }
 
   return selected.value
+}
+
+function flatten(components: AnyComponent[]): AnyComponent[] {
+  return components.flatMap<AnyComponent>((component) => {
+    switch (component.type) {
+      case ComponentType.ActionRow:
+        return component.components
+      case ComponentType.Container:
+        return flatten(component.components)
+      case ComponentType.Section:
+        return [...component.components, component.accessory]
+      default:
+        return [component]
+    }
+  })
+}
+
+function findComponentById(
+  components: TopLevelComponent[],
+  id: number,
+): AnyComponent | undefined {
+  // @ts-expect-error I don't think I can fix this
+  return flatten(components).find((component) => component.id === id)
+}
+
+function findComponentByCustomId(
+  components: TopLevelComponent[],
+  customId: string,
+): AnyComponent | undefined {
+  // @ts-expect-error I don't think I can fix this
+  return flatten(components).find(
+    // @ts-expect-error Discord.js does it internally, so it should be fine
+    (component) => (component.customId ?? component.custom_id) === customId,
+  )
+}
+
+function text(component?: AnyComponent) {
+  return component?.type === ComponentType.TextDisplay
+    ? component.content
+    : undefined
 }

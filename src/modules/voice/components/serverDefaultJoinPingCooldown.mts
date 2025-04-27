@@ -2,8 +2,8 @@ import { desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { guildConfigTable } from "../../../schema.mjs"
+import { serverSettingsMessage } from "../commands/server.mjs"
 import { Cooldowns } from "../cooldown.mjs"
-import { serverJoinPingSettings } from "../util.mjs"
 
 export const ServerDefaultJoinPingCooldown = d
   .select()
@@ -55,5 +55,5 @@ export const ServerDefaultJoinPingCooldown = d
         .returning()
     })
 
-    await interaction.update(serverJoinPingSettings(guildConfig))
+    await interaction.update(serverSettingsMessage(guildConfig))
   })

@@ -2,8 +2,8 @@ import { desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { guildConfigTable } from "../../../schema.mjs"
+import { serverSettingsMessage } from "../commands/server.mjs"
 import { Cooldowns } from "../cooldown.mjs"
-import { serverStreamingPingSettings } from "../util.mjs"
 
 export const ServerMaxStreamingPingCooldown = d
   .select()
@@ -55,5 +55,5 @@ export const ServerMaxStreamingPingCooldown = d
         .returning()
     })
 
-    await interaction.update(serverStreamingPingSettings(guildConfig))
+    await interaction.update(serverSettingsMessage(guildConfig))
   })

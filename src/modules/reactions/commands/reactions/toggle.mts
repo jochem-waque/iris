@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, EmbedBuilder, MessageFlags } from "discord.js"
+import { Colors, MessageFlags } from "discord.js"
 import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../../index.mjs"
@@ -33,28 +33,30 @@ export const Toggle = d
 
     if (stored) {
       await interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        embeds: [
-          new EmbedBuilder()
-            .setTitle("Reactions enabled")
-            .setDescription(
-              "Reactions will now be added to messages that ping you!",
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+        components: [
+          d
+            .container(
+              d.text(`# Reactions enabled
+Reactions will now be added to messages that ping you!`),
             )
-            .setColor(Colors.Green),
+            .accent(Colors.Green)
+            .build(),
         ],
       })
       return
     }
 
     await interaction.reply({
-      flags: MessageFlags.Ephemeral,
-      embeds: [
-        new EmbedBuilder()
-          .setTitle("Reactions disabled")
-          .setDescription(
-            "Reactions will now no longer be added to messages that ping you.",
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+      components: [
+        d
+          .container(
+            d.text(`# Reactions disabled
+Reactions will no longer be added to messages that ping you`),
           )
-          .setColor(Colors.Red),
+          .accent(Colors.Red)
+          .build(),
       ],
     })
   })

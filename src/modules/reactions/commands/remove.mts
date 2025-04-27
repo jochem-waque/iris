@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, EmbedBuilder, MessageFlags } from "discord.js"
+import { Colors, MessageFlags } from "discord.js"
 import d from "fluent-commands"
 
 export const Remove = d
@@ -13,20 +13,23 @@ export const Remove = d
   .handler(async (interaction) => {
     if (interaction.targetMessage.author.id !== interaction.user.id) {
       await interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        embeds: [
-          new EmbedBuilder()
-            .setTitle("Can't remove reactions")
-            .setDescription(
-              "You can't remove reactions from messages that aren't yours!",
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+        components: [
+          d
+            .container(
+              d.text(`# Can't remove reactions
+You can't remove reactions from messages that aren't yours!`),
             )
-            .setColor(Colors.Red),
+            .accent(Colors.Red)
+            .build(),
         ],
       })
       return
     }
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral })
+    await interaction.deferReply({
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+    })
     await interaction.deleteReply()
 
     await interaction.targetMessage.reactions.removeAll()

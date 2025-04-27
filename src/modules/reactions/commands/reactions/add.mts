@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, EmbedBuilder, MessageFlags } from "discord.js"
+import { Colors, MessageFlags } from "discord.js"
 import d from "fluent-commands"
 import { Emojis } from "../../events/reactOnMention.mjs"
 
@@ -15,7 +15,9 @@ export const Add = d
       return
     }
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral })
+    await interaction.deferReply({
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+    })
 
     const messages = await interaction.channel.messages.fetch({
       limit: 100,
@@ -27,21 +29,30 @@ export const Add = d
     )
     if (!first) {
       await interaction.editReply({
-        embeds: [
-          new EmbedBuilder()
-            .setTitle("No message found")
-            .setDescription("Couldn't find a message to add reactions to!")
-            .setColor(Colors.Red),
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+        components: [
+          d
+            .container(
+              d.text(`# No message found
+Couldn't find a message to add reactions to!`),
+            )
+            .accent(Colors.Red)
+            .build(),
         ],
       })
       return
     }
 
     await interaction.editReply({
-      embeds: [
-        new EmbedBuilder()
-          .setTitle("Adding reactions")
-          .setDescription(`Adding reactions to ${first.url}`),
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+      components: [
+        d
+          .container(
+            d.text(`# Adding reactions
+Adding reactions to ${first.url}`),
+          )
+          .accent(Colors.Red)
+          .build(),
       ],
     })
 

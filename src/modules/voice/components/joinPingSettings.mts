@@ -2,7 +2,7 @@ import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { guildConfigTable, memberConfigTable } from "../../../schema.mjs"
-import { joinPings } from "../commands/pings.mjs"
+import { joinPings, pingsMessage } from "../commands/pings.mjs"
 import { Cooldowns } from "../cooldown.mjs"
 
 export const JoinPingSettings = d
@@ -87,9 +87,7 @@ export const JoinPingSettings = d
       },
     )
 
-    await interaction.update({
-      components: [d.row(joinPingSettings(guildConfig, memberConfig)).build()],
-    })
+    await interaction.update(pingsMessage(guildConfig, memberConfig))
   })
 
 export function joinPingSettings(

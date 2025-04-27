@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { EmbedBuilder, Guild, MessageFlags, unorderedList } from "discord.js"
+import { Guild, MessageFlags, unorderedList } from "discord.js"
 import { desc, eq, inArray } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -36,19 +36,15 @@ export const RemoveActivityDropdown = d
       .returning()
 
     await interaction.update({
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
       components: [
-        d.row(await removeActivityDropdown(interaction.guild)).build(),
-      ],
-    })
-
-    await interaction.followUp({
-      flags: MessageFlags.Ephemeral,
-      embeds: [
-        new EmbedBuilder()
-          .setTitle(
-            `Removed ${deleted.length} ${deleted.length === 1 ? "entry" : "entries"}`,
+        d
+          .container(
+            d.row(await removeActivityDropdown(interaction.guild)),
+            d.text(`# Removed ${deleted.length} ${deleted.length === 1 ? "entry" : "entries"}
+${unorderedList(deleted.map((entry) => entry.label))}`),
           )
-          .setDescription(unorderedList(deleted.map((entry) => entry.label))),
+          .build(),
       ],
     })
   })

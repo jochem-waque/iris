@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { EmbedBuilder, MessageFlags, unorderedList } from "discord.js"
+import { MessageFlags, unorderedList } from "discord.js"
 import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -47,31 +47,31 @@ export const Pings = d
           },
         )
 
-        await interaction.reply({
-          flags: MessageFlags.Ephemeral,
-          embeds: [
-            new EmbedBuilder()
-              .setTitle("Join pings")
-              .setDescription(pingsTexts("join", guildConfig)),
-          ],
-          components: [
-            d.row(joinPingSettings(guildConfig, memberConfig)).build(),
-          ],
-        })
-
-        await interaction.followUp({
-          flags: MessageFlags.Ephemeral,
-          embeds: [
-            new EmbedBuilder()
-              .setTitle("Streaming pings")
-              .setDescription(pingsTexts("streaming", guildConfig)),
-          ],
-          components: [
-            d.row(streamingPingSettings(guildConfig, memberConfig)).build(),
-          ],
-        })
+        await interaction.reply(pingsMessage(guildConfig, memberConfig))
       }),
   })
+
+export function pingsMessage(
+  guildConfig?: typeof guildConfigTable.$inferSelect,
+  memberConfig?: typeof memberConfigTable.$inferSelect,
+) {
+  return {
+    flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+    components: [
+      d
+        .container(
+          d.text(`# Join pings
+${pingsTexts("join", guildConfig)}`),
+          d.row(joinPingSettings(guildConfig, memberConfig)),
+          d.separator(),
+          d.text(`# Streaming pings
+${pingsTexts("streaming", guildConfig)}`),
+          d.row(streamingPingSettings(guildConfig, memberConfig)),
+        )
+        .build(),
+    ],
+  }
+}
 
 function pingsTexts(
   type: "join" | "streaming",

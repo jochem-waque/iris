@@ -7,7 +7,7 @@
 import {
   channelMention,
   ChannelType,
-  EmbedBuilder,
+  Colors,
   InteractionContextType,
   MessageFlags,
   PermissionFlagsBits,
@@ -37,13 +37,15 @@ export const Link = d
       await Database.delete(linkTable).where(eq(linkTable.voice_id, voice.id))
 
       await interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        embeds: [
-          new EmbedBuilder()
-            .setTitle("Channel unlinked")
-            .setDescription(
-              `${channelMention(voice.id)} is now no longer linked to a separate text channel.`,
-            ),
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+        components: [
+          d
+            .container(
+              d.text(`# Channel unlinked
+${channelMention(voice.id)} is now no longer linked to a separate text channel.`),
+            )
+            .accent(Colors.Red)
+            .build(),
         ],
       })
 
@@ -61,13 +63,15 @@ export const Link = d
       })
 
     await interaction.reply({
-      flags: MessageFlags.Ephemeral,
-      embeds: [
-        new EmbedBuilder()
-          .setTitle("Channel linked")
-          .setDescription(
-            `${channelMention(voice.id)} is now linked to ${channelMention(text.id)}!`,
-          ),
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+      components: [
+        d
+          .container(
+            d.text(`# Channel linked
+${channelMention(voice.id)} is now linked to ${channelMention(text.id)}!`),
+          )
+          .accent(Colors.Green)
+          .build(),
       ],
     })
   })

@@ -2,7 +2,7 @@ import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { guildConfigTable, memberConfigTable } from "../../../schema.mjs"
-import { streamingPings } from "../commands/pings.mjs"
+import { pingsMessage, streamingPings } from "../commands/pings.mjs"
 import { Cooldowns } from "../cooldown.mjs"
 
 export const StreamingPingSettings = d
@@ -86,11 +86,7 @@ export const StreamingPingSettings = d
       },
     )
 
-    await interaction.update({
-      components: [
-        d.row(streamingPingSettings(guildConfig, memberConfig)).build(),
-      ],
-    })
+    await interaction.update(pingsMessage(guildConfig, memberConfig))
   })
 
 export function streamingPingSettings(

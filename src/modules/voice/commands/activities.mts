@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { EmbedBuilder, MessageFlags } from "discord.js"
+import { MessageFlags } from "discord.js"
 import d from "fluent-commands"
 import { removeActivityDropdown } from "../components/removeActivityDropdown.mjs"
 
@@ -19,16 +19,15 @@ export const Activities = d
         }
 
         await interaction.reply({
-          flags: MessageFlags.Ephemeral,
-          embeds: [
-            new EmbedBuilder()
-              .setTitle("Remove activities")
-              .setDescription(
-                "Select the activities you'd like to remove from the voice channel activity dropdown.",
-              ),
-          ],
+          flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
           components: [
-            d.row(await removeActivityDropdown(interaction.guild)).build(),
+            d
+              .container(
+                d.text(`# Remove activities
+Select the activities you'd like to remove from the voice channel activity dropdown.`),
+                d.row(await removeActivityDropdown(interaction.guild)),
+              )
+              .build(),
           ],
         })
       }),

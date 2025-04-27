@@ -31,16 +31,25 @@ export const Server = d
           .orderBy(desc(guildConfigTable.timestamp))
           .limit(1)
 
-        await interaction.reply({
-          flags: MessageFlags.Ephemeral,
-          content: heading("Join pings"),
-          ...serverJoinPingSettings(guildConfig),
-        })
-
-        await interaction.followUp({
-          flags: MessageFlags.Ephemeral,
-          content: heading("Streaming pings"),
-          ...serverStreamingPingSettings(guildConfig),
-        })
+        await interaction.reply(serverSettingsMessage(guildConfig))
       }),
   })
+
+export function serverSettingsMessage(
+  guildConfig?: typeof guildConfigTable.$inferSelect,
+) {
+  return {
+    flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+    components: [
+      d
+        .container(
+          d.text(heading("Join pings")),
+          ...serverJoinPingSettings(guildConfig),
+          d.separator(),
+          d.text(heading("Streaming pings")),
+          ...serverStreamingPingSettings(guildConfig),
+        )
+        .build(),
+    ],
+  }
+}

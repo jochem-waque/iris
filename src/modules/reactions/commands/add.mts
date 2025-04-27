@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, EmbedBuilder, MessageFlags } from "discord.js"
+import { Colors, MessageFlags } from "discord.js"
 import d from "fluent-commands"
 import { Emojis } from "../events/reactOnMention.mjs"
 
@@ -14,20 +14,23 @@ export const Add = d
   .handler(async (interaction) => {
     if (interaction.targetMessage.author.id !== interaction.user.id) {
       await interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        embeds: [
-          new EmbedBuilder()
-            .setTitle("Can't add reactions")
-            .setDescription(
-              "You can't add reactions to messages that aren't yours!",
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+        components: [
+          d
+            .container(
+              d.text(`# Can't add reactions
+You can't add reactions to messages that aren't yours!`),
             )
-            .setColor(Colors.Red),
+            .accent(Colors.Red)
+            .build(),
         ],
       })
       return
     }
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral })
+    await interaction.deferReply({
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+    })
     await interaction.deleteReply()
 
     for (const emoji of Emojis) {
