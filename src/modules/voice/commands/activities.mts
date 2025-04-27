@@ -27,7 +27,9 @@ export const Activities = d
                 "Select the activities you'd like to remove from the voice channel activity dropdown.",
               ),
           ],
-          components: [d.row(await removeActivityDropdown(interaction.guild))],
+          components: [
+            d.row(await removeActivityDropdown(interaction.guild)).build(),
+          ],
         })
       }),
   })

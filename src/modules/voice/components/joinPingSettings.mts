@@ -1,3 +1,4 @@
+import { StringSelectMenuBuilder } from "discord.js"
 import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -88,7 +89,7 @@ export const JoinPingSettings = d
     )
 
     await interaction.update({
-      components: [d.row(joinPingSettings(guildConfig, memberConfig))],
+      components: [d.row(joinPingSettings(guildConfig, memberConfig)).build()],
     })
   })
 
@@ -98,21 +99,19 @@ export function joinPingSettings(
 ) {
   const { guild, member } = joinPings(guildConfig, memberConfig)
 
-  const component = JoinPingSettings.build([member.toString()] as Parameters<
-    (typeof JoinPingSettings)["build"]
-  >[0])
+  const component = JoinPingSettings.with([member.toString()])
 
   if (!guild.allowOptOut) {
-    component.options.pop()
+    component.spliceOptions(component.options.length - 1, 1)
   }
 
   for (let i = 0; i < component.options.length; i++) {
     const option = component.options[i]
-    if (!option) {
+    if (!option?.data.value) {
       continue
     }
 
-    const number = parseInt(option.value, 10)
+    const number = parseInt(option.data.value, 10)
     if (isNaN(number)) {
       continue
     }
@@ -121,9 +120,8 @@ export function joinPingSettings(
       continue
     }
 
-    component.options.splice(i, 1)
-    i--
+    component.spliceOptions(i, 1)
   }
 
-  return component
+  return StringSelectMenuBuilder.from(component)
 }

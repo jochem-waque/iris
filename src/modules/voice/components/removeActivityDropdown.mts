@@ -4,7 +4,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { EmbedBuilder, Guild, MessageFlags, unorderedList } from "discord.js"
+import {
+  EmbedBuilder,
+  Guild,
+  MessageFlags,
+  StringSelectMenuBuilder,
+  unorderedList,
+} from "discord.js"
 import { desc, eq, inArray } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -35,7 +41,9 @@ export const RemoveActivityDropdown = d
       .returning()
 
     await interaction.update({
-      components: [d.row(await removeActivityDropdown(interaction.guild))],
+      components: [
+        d.row(await removeActivityDropdown(interaction.guild)).build(),
+      ],
     })
 
     await interaction.followUp({
@@ -61,9 +69,10 @@ export async function removeActivityDropdown(guild: Guild) {
     d.select().stringOption(id.toString()).builder.setLabel(label),
   )
 
-  const dropdown = RemoveActivityDropdown.build()
-  dropdown.options.push(...options.map((builder) => builder.toJSON()))
-  dropdown.max_values = options.length
+  // TODO empty with() feels off
+  const dropdown = RemoveActivityDropdown.with()
+  dropdown.addOptions(...options)
+  dropdown.setMaxValues(options.length)
 
-  return dropdown
+  return StringSelectMenuBuilder.from(dropdown)
 }

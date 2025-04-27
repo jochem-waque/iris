@@ -87,7 +87,9 @@ export const StreamingPingSettings = d
     )
 
     await interaction.update({
-      components: [d.row(streamingPingSettings(guildConfig, memberConfig))],
+      components: [
+        d.row(streamingPingSettings(guildConfig, memberConfig)).build(),
+      ],
     })
   })
 
@@ -97,9 +99,7 @@ export function streamingPingSettings(
 ) {
   const { guild, member } = streamingPings(guildConfig, memberConfig)
 
-  const component = StreamingPingSettings.build([
-    member.toString(),
-  ] as Parameters<(typeof StreamingPingSettings)["build"]>[0])
+  const component = StreamingPingSettings.with([member.toString()])
 
   if (!guild.allowOptOut) {
     component.options.pop()
@@ -107,11 +107,11 @@ export function streamingPingSettings(
 
   for (let i = 0; i < component.options.length; i++) {
     const option = component.options[i]
-    if (!option) {
+    if (!option?.data.value) {
       continue
     }
 
-    const number = parseInt(option.value, 10)
+    const number = parseInt(option.data.value, 10)
     if (isNaN(number)) {
       continue
     }

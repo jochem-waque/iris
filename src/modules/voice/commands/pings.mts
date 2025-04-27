@@ -54,7 +54,9 @@ export const Pings = d
               .setTitle("Join pings")
               .setDescription(pingsTexts("join", guildConfig)),
           ],
-          components: [d.row(joinPingSettings(guildConfig, memberConfig))],
+          components: [
+            d.row(joinPingSettings(guildConfig, memberConfig)).build(),
+          ],
         })
 
         await interaction.followUp({
@@ -64,7 +66,9 @@ export const Pings = d
               .setTitle("Streaming pings")
               .setDescription(pingsTexts("streaming", guildConfig)),
           ],
-          components: [d.row(streamingPingSettings(guildConfig, memberConfig))],
+          components: [
+            d.row(streamingPingSettings(guildConfig, memberConfig)).build(),
+          ],
         })
       }),
   })

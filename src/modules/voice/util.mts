@@ -6,7 +6,6 @@
 
 import {
   AnyComponent,
-  APISelectMenuOption,
   BaseInteraction,
   channelMention,
   ComponentType,
@@ -18,6 +17,7 @@ import {
   MessageCreateOptions,
   RESTJSONErrorCodes,
   Snowflake,
+  StringSelectMenuOptionBuilder,
   userMention,
   VoiceBasedChannel,
   VoiceState,
@@ -149,8 +149,10 @@ export async function voiceStatus({
     }
   }
 
-  activity ??= selectedValue(oldMessage?.components[0]?.components[0]?.data)
-  noise ??= selectedValue(oldMessage?.components[1]?.components[0]?.data)
+  activity ??= selectedValue(
+    oldMessage?.resolveComponent(ActivityDropdown.id)?.data,
+  )
+  noise ??= selectedValue(oldMessage?.resolveComponent(NoiseDropdown.id)?.data)
   voiceId ??= oldMessage?.embeds[0]?.fields[0]?.value.slice(2, -1)
 
   const activities = await Database.select()
@@ -163,25 +165,26 @@ export async function voiceStatus({
     d.select().stringOption(id.toString()).builder.setLabel(label),
   )
 
-  const activityDropdown = ActivityDropdown.build()
-  activityDropdown.options.unshift(
-    ...options.map((builder) => builder.toJSON()),
+  const activityDropdown = ActivityDropdown.with().spliceOptions(
+    0,
+    0,
+    ...options,
   )
 
-  const noiseDropdown = NoiseDropdown.build(noise ? [noise as never] : [])
+  const noiseDropdown = NoiseDropdown.with(noise ? [noise as never] : [])
 
   const currentActivity = activityDropdown.options.find(
-    (option) => option.value === activity,
+    (option) => option.data.value === activity,
   )
   if (currentActivity) {
-    currentActivity.default = true
+    currentActivity.setDefault(true)
   }
 
   const currentNoise = noiseDropdown.options.find(
-    (option) => option.value === noise,
+    (option) => option.data.value === noise,
   )
   if (currentNoise) {
-    currentNoise.default = true
+    currentNoise.setDefault(true)
   }
 
   const embed = new EmbedBuilder()
@@ -195,7 +198,7 @@ export async function voiceStatus({
   }
 
   const messageOptions: InteractionUpdateOptions & MessageCreateOptions = {
-    components: [d.row(activityDropdown), d.row(noiseDropdown)],
+    components: [d.row(activityDropdown).build(), d.row(noiseDropdown).build()],
     embeds: [embed],
   }
 
@@ -207,7 +210,7 @@ export async function voiceStatus({
     messageOptions,
     status:
       currentActivity || currentNoise
-        ? `${formatOption(currentActivity)} | ${formatOption(currentNoise).toLowerCase()}`
+        ? `${formatOption(currentActivity)} | ${formatOption(currentNoise)?.toLowerCase()}`
         : null,
     channelId: voiceId,
   }
@@ -376,26 +379,30 @@ export function serverJoinPingSettings(
 ) {
   const { guild } = joinPings(config)
 
-  const maxCooldown = ServerMaxJoinPingCooldown.build([
+  const maxCooldown = ServerMaxJoinPingCooldown.with([
     guild.maxCooldown.toString() as "0",
   ])
   if (guild.allowOptOut) {
-    maxCooldown.disabled = true
+    maxCooldown.setDisabled(true)
   }
 
   return {
     components: [
-      d.row(
-        ServerJoinPingOptOut.build([
-          guild.allowOptOut === true ? "true" : "false",
-        ]),
-      ),
-      d.row(
-        ServerDefaultJoinPingCooldown.build([
-          guild.defaultCooldown.toString() as "0",
-        ]),
-      ),
-      d.row(maxCooldown),
+      d
+        .row(
+          ServerJoinPingOptOut.with([
+            guild.allowOptOut === true ? "true" : "false",
+          ]),
+        )
+        .build(),
+      d
+        .row(
+          ServerDefaultJoinPingCooldown.with([
+            guild.defaultCooldown.toString() as "0",
+          ]),
+        )
+        .build(),
+      d.row(maxCooldown).build(),
     ],
   }
 }
@@ -405,40 +412,44 @@ export function serverStreamingPingSettings(
 ) {
   const { guild } = streamingPings(config)
 
-  const maxCooldown = ServerMaxStreamingPingCooldown.build([
+  const maxCooldown = ServerMaxStreamingPingCooldown.with([
     guild.maxCooldown.toString() as "0",
   ])
   if (guild.allowOptOut) {
-    maxCooldown.disabled = true
+    maxCooldown.setDisabled(true)
   }
 
   return {
     components: [
-      d.row(
-        ServerStreamingPingOptOut.build([
-          guild.allowOptOut === true ? "true" : "false",
-        ]),
-      ),
-      d.row(
-        ServerDefaultStreamingPingCooldown.build([
-          guild.defaultCooldown.toString() as "0",
-        ]),
-      ),
-      d.row(maxCooldown),
+      d
+        .row(
+          ServerStreamingPingOptOut.with([
+            guild.allowOptOut === true ? "true" : "false",
+          ]),
+        )
+        .build(),
+      d
+        .row(
+          ServerDefaultStreamingPingCooldown.with([
+            guild.defaultCooldown.toString() as "0",
+          ]),
+        )
+        .build(),
+      d.row(maxCooldown).build(),
     ],
   }
 }
 
-function formatOption(option?: APISelectMenuOption) {
+function formatOption(option?: StringSelectMenuOptionBuilder) {
   if (!option) {
     return "unset"
   }
 
-  if (!option.emoji?.name) {
-    return option.label
+  if (!option.data.emoji?.name) {
+    return option.data.label
   }
 
-  return `${option.emoji.name} ${option.label}`
+  return `${option.data.emoji.name} ${option.data.label}`
 }
 
 function selectedValue(component?: AnyComponent) {
