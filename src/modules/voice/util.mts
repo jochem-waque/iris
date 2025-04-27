@@ -359,13 +359,14 @@ export async function fetchOldMessage(
     message = await channel.messages.fetch(old.message_id)
   } catch (e) {
     if (
-      !(e instanceof DiscordAPIError) ||
-      e.code !== RESTJSONErrorCodes.UnknownMessage
+      e instanceof DiscordAPIError &&
+      (e.code === RESTJSONErrorCodes.UnknownMessage ||
+        e.code === RESTJSONErrorCodes.MissingAccess)
     ) {
-      throw e
+      return null
     }
 
-    return null
+    throw e
   }
 
   return message

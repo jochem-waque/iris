@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ChannelType } from "discord.js"
+import { ChannelType, DiscordAPIError, RESTJSONErrorCodes } from "discord.js"
 import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -67,7 +67,19 @@ export const SubsequentJoin = d
 
       const channel = await getTextChannel(voiceChannel)
 
-      const message = await channel.send(messageOptions)
+      let message
+      try {
+        message = await channel.send(messageOptions)
+      } catch (e) {
+        if (
+          !(e instanceof DiscordAPIError) ||
+          e.code !== RESTJSONErrorCodes.MissingAccess
+        ) {
+          throw e
+        }
+
+        return
+      }
 
       await tx
         .delete(messageTable)

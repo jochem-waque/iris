@@ -9,7 +9,7 @@ import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
 
-import { ChannelType } from "discord.js"
+import { ChannelType, DiscordAPIError, RESTJSONErrorCodes } from "discord.js"
 import {
   fetchOldMessage,
   getTextChannel,
@@ -62,7 +62,19 @@ export const MemberStreams = d
 
       const channel = await getTextChannel(voiceChannel)
 
-      const message = await channel.send(messageOptions)
+      let message
+      try {
+        message = await channel.send(messageOptions)
+      } catch (e) {
+        if (
+          !(e instanceof DiscordAPIError) ||
+          e.code !== RESTJSONErrorCodes.MissingAccess
+        ) {
+          throw e
+        }
+
+        return
+      }
 
       await tx
         .delete(messageTable)
