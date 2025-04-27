@@ -4,13 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-  EmbedBuilder,
-  Guild,
-  MessageFlags,
-  StringSelectMenuBuilder,
-  unorderedList,
-} from "discord.js"
+import { EmbedBuilder, Guild, MessageFlags, unorderedList } from "discord.js"
 import { desc, eq, inArray } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -74,5 +68,5 @@ export async function removeActivityDropdown(guild: Guild) {
   dropdown.addOptions(...options)
   dropdown.setMaxValues(options.length)
 
-  return StringSelectMenuBuilder.from(dropdown)
+  return dropdown
 }

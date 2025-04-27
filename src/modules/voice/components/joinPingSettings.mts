@@ -1,4 +1,3 @@
-import { StringSelectMenuBuilder } from "discord.js"
 import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -124,5 +123,5 @@ export function joinPingSettings(
     i--
   }
 
-  return StringSelectMenuBuilder.from(component)
+  return component
 }

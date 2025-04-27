@@ -102,7 +102,7 @@ export function streamingPingSettings(
   const component = StreamingPingSettings.with([member.toString()])
 
   if (!guild.allowOptOut) {
-    component.options.pop()
+    component.spliceOptions(component.options.length - 1, 1)
   }
 
   for (let i = 0; i < component.options.length; i++) {
@@ -120,7 +120,7 @@ export function streamingPingSettings(
       continue
     }
 
-    component.options.splice(i, 1)
+    component.spliceOptions(i, 1)
     i--
   }
 
