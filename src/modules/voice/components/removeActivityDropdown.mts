@@ -23,6 +23,7 @@ export const RemoveActivityDropdown = d
 
     if (interaction.values.length === 0) {
       await interaction.deferUpdate()
+      return
     }
 
     const deleted = await Database.delete(activitiesTable)
