@@ -121,6 +121,7 @@ export function joinPingSettings(
     }
 
     component.spliceOptions(i, 1)
+    i--
   }
 
   return StringSelectMenuBuilder.from(component)
