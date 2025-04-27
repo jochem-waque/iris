@@ -1,5 +1,6 @@
 blacklist.json
 *.db
+file
 
 # Logs
 logs
