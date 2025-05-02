@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { GatewayIntentBits, Partials } from "discord.js"
+import { GatewayIntentBits, MessageFlags, Partials } from "discord.js"
 import { drizzle } from "drizzle-orm/better-sqlite3"
 import { migrate } from "drizzle-orm/better-sqlite3/migrator"
 import d from "fluent-commands"
@@ -41,6 +41,27 @@ const bot = d
   .addModule(General)
   .addModule(Voice)
   .addModule(Reactions)
+  .errorHandler((context) => {
+    console.log(context)
+
+    if (!context.interaction?.isRepliable()) {
+      return
+    }
+
+    context.interaction
+      .followUp({
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+        components: [
+          d
+            .container(
+              d.text(`# An error occurred
+An error occurred while handling this interaction. Please ensure that the bot has the necessary permissions to perform its actions. If the permissions are setup correctly, feel free to open an issue on GitHub or message @lucasfloof on Discord directly.`),
+            )
+            .build(),
+        ],
+      })
+      .catch(console.error)
+  })
   .register()
 
 await bot.client.login(Env.botToken)

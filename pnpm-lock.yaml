@@ -21,8 +21,8 @@ importers:
         specifier: ^0.43.1
         version: 0.43.1(@libsql/client@0.15.4(bufferutil@4.0.9))(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1)(gel@2.0.2)
       fluent-commands:
-        specifier: 2.0.0-pre.2025-04-27.sha-e9acfc30
-        version: 2.0.0-pre.2025-04-27.sha-e9acfc30(discord.js@14.19.3(bufferutil@4.0.9))
+        specifier: 2.0.0-pre.2025-05-02.sha-6f89ac09
+        version: 2.0.0-pre.2025-05-02.sha-6f89ac09(discord.js@14.19.3(bufferutil@4.0.9))
       zod:
         specifier: ^3.24.3
         version: 3.24.3
@@ -1051,8 +1051,8 @@ packages:
   flatted@3.3.3:
     resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
 
-  fluent-commands@2.0.0-pre.2025-04-27.sha-e9acfc30:
-    resolution: {integrity: sha512-GnxNRuzCziYCEYZkkrKS4XhiHkMpVivHo4pi9/BbI2yWlBkSLA2shw3oBZw4XJEgnAgQ7Y0AzmhbWJ3N9lNuew==}
+  fluent-commands@2.0.0-pre.2025-05-02.sha-6f89ac09:
+    resolution: {integrity: sha512-v75gQP8Ofm9SjvDK2JzbP3y+hdEzPMPEOKkneogd7HrZH59LdKiSZrK+8+Wr//1g+kzh0Qbd1NrOqxQeNXRcaA==}
     engines: {node: '>=22'}
     peerDependencies:
       discord.js: ^14.18.0
@@ -2577,7 +2577,7 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  fluent-commands@2.0.0-pre.2025-04-27.sha-e9acfc30(discord.js@14.19.3(bufferutil@4.0.9)):
+  fluent-commands@2.0.0-pre.2025-05-02.sha-6f89ac09(discord.js@14.19.3(bufferutil@4.0.9)):
     dependencies:
       discord.js: 14.19.3(bufferutil@4.0.9)
 
