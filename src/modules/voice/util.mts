@@ -13,6 +13,7 @@ import {
   Guild,
   InteractionUpdateOptions,
   Message,
+  MessageActionRowComponent,
   MessageCreateOptions,
   MessageFlags,
   RESTJSONErrorCodes,
@@ -156,12 +157,8 @@ export async function voiceStatus({
   }
 
   // FIXME wait for discord.js fix
-  activity ??= selectedValue(
-    findComponentByCustomId(oldMessage?.components ?? [], ActivityDropdown.id),
-  )
-  noise ??= selectedValue(
-    findComponentByCustomId(oldMessage?.components ?? [], NoiseDropdown.id),
-  )
+  activity ??= selectedValue(oldMessage?.resolveComponent(ActivityDropdown.id))
+  noise ??= selectedValue(oldMessage?.resolveComponent(NoiseDropdown.id))
   voiceId ??= text(findComponentById(oldMessage?.components ?? [], 1))?.slice(
     2,
     -1,
@@ -461,7 +458,7 @@ function formatOption(option?: StringSelectMenuOptionBuilder) {
   return `${option.data.emoji.name} ${option.data.label}`
 }
 
-function selectedValue(component?: AnyComponent) {
+function selectedValue(component?: MessageActionRowComponent | null) {
   if (component?.type !== ComponentType.StringSelect) {
     return undefined
   }
@@ -495,17 +492,6 @@ function findComponentById(
 ): AnyComponent | undefined {
   // @ts-expect-error I don't think I can fix this
   return flatten(components).find((component) => component.id === id)
-}
-
-function findComponentByCustomId(
-  components: TopLevelComponent[],
-  customId: string,
-): AnyComponent | undefined {
-  // @ts-expect-error I don't think I can fix this
-  return flatten(components).find(
-    // @ts-expect-error Discord.js does it internally, so it should be fine
-    (component) => (component.customId ?? component.custom_id) === customId,
-  )
 }
 
 function text(component?: AnyComponent) {
