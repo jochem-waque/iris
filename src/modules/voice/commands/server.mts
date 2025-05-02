@@ -39,6 +39,7 @@ export function serverSettingsMessage(
   guildConfig?: typeof guildConfigTable.$inferSelect,
 ) {
   return {
+    content: "",
     flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
     components: [
       d

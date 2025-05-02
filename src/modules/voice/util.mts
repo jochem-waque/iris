@@ -200,6 +200,7 @@ export async function voiceStatus({
   }
 
   const messageOptions: MessageCreateOptions = {
+    content: "",
     flags: MessageFlags.IsComponentsV2,
     components: [
       d
@@ -230,11 +231,21 @@ export async function setVoiceChannelStatus(
   channel: VoiceBasedChannel,
   status: string | null,
 ) {
-  await channel.client.rest.put(`/channels/${channel.id}/voice-status`, {
-    body: {
-      status,
-    },
-  })
+  try {
+    await channel.client.rest.put(`/channels/${channel.id}/voice-status`, {
+      body: {
+        status,
+      },
+    })
+  } catch (e) {
+    if (
+      !(e instanceof DiscordAPIError) ||
+      (e.code !== RESTJSONErrorCodes.MissingAccess &&
+        e.code !== RESTJSONErrorCodes.CannotExecuteActionOnThisChannelType)
+    ) {
+      throw e
+    }
+  }
 }
 
 export function voiceChannelStates(channel: VoiceBasedChannel) {

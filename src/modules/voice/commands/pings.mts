@@ -56,6 +56,7 @@ export function pingsMessage(
   memberConfig?: typeof memberConfigTable.$inferSelect,
 ) {
   return {
+    content: "",
     flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
     components: [
       d

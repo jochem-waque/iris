@@ -4,7 +4,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, MessageFlags } from "discord.js"
+import {
+  Colors,
+  DiscordAPIError,
+  MessageFlags,
+  RESTJSONErrorCodes,
+} from "discord.js"
 import d from "fluent-commands"
 import { Emojis } from "../../events/reactOnMention.mjs"
 
@@ -29,6 +34,7 @@ export const Add = d
     )
     if (!first) {
       await interaction.editReply({
+        content: "",
         flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         components: [
           d
@@ -44,6 +50,7 @@ Couldn't find a message to add reactions to!`),
     }
 
     await interaction.editReply({
+      content: "",
       flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
       components: [
         d
@@ -51,13 +58,37 @@ Couldn't find a message to add reactions to!`),
             d.text(`# Adding reactions
 Adding reactions to ${first.url}`),
           )
-          .accent(Colors.Red)
+          .accent(Colors.Green)
           .build(),
       ],
     })
 
-    for (const emoji of Emojis) {
-      await first.react(emoji)
+    try {
+      for (const emoji of Emojis) {
+        await first.react(emoji)
+      }
+    } catch (e) {
+      if (
+        !(e instanceof DiscordAPIError) ||
+        e.code !== RESTJSONErrorCodes.MissingAccess
+      ) {
+        throw e
+      }
+
+      await interaction.editReply({
+        content: "",
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+        components: [
+          d
+            .container(
+              d.text(`# Adding reactions
+I don't have permission to add reactions to ${first.url}!`),
+            )
+            .accent(Colors.Red)
+            .build(),
+        ],
+      })
+      return
     }
 
     await interaction.deleteReply()

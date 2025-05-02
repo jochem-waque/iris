@@ -36,6 +36,7 @@ export const RemoveActivityDropdown = d
       .returning()
 
     await interaction.update({
+      content: "",
       flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
       components: [
         d
