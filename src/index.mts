@@ -48,19 +48,24 @@ const bot = d
       return
     }
 
-    context.interaction
-      .followUp({
-        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
-        components: [
-          d
-            .container(
-              d.text(`# An error occurred
+    const reply = {
+      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+      components: [
+        d
+          .container(
+            d.text(`# An error occurred
 An error occurred while handling this interaction. Please ensure that the bot has the necessary permissions to perform its actions. If the permissions are setup correctly, feel free to open an issue on GitHub or message @lucasfloof on Discord directly.`),
-            )
-            .build(),
-        ],
-      })
-      .catch(console.error)
+          )
+          .build(),
+      ],
+    }
+
+    if (context.interaction.replied) {
+      context.interaction.followUp(reply).catch(console.error)
+      return
+    }
+
+    context.interaction.reply(reply).catch(console.error)
   })
   .register()
 
