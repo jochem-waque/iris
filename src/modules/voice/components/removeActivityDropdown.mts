@@ -35,15 +35,17 @@ export const RemoveActivityDropdown = d
       )
       .returning()
 
+    const dropdown = await removeActivityDropdown(interaction.guild)
+
     await interaction.update({
       content: "",
       flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
       components: [
         d
           .container(
-            d.row(await removeActivityDropdown(interaction.guild)),
+            d.row(dropdown),
             d.text(`# Removed ${deleted.length} ${deleted.length === 1 ? "entry" : "entries"}
-${unorderedList(deleted.map((entry) => entry.label))}`),
+  ${unorderedList(deleted.map((entry) => entry.label))}`),
           )
           .build(),
       ],
@@ -57,12 +59,22 @@ export async function removeActivityDropdown(guild: Guild) {
     .orderBy(desc(activitiesTable.last_used))
     .limit(25)
 
+  // TODO empty with() feels off
+  const dropdown = RemoveActivityDropdown.with()
+
+  if (activities.length === 0) {
+    dropdown.addOptions(
+      d.select().stringOption("disabled").builder.setLabel("disabled"),
+    )
+    dropdown.setDisabled(true)
+    dropdown.setPlaceholder("No activities to remove")
+    return dropdown
+  }
+
   const options = activities.map(({ id, label }) =>
     d.select().stringOption(id.toString()).builder.setLabel(label),
   )
 
-  // TODO empty with() feels off
-  const dropdown = RemoveActivityDropdown.with()
   dropdown.addOptions(...options)
   dropdown.setMaxValues(options.length)
 
