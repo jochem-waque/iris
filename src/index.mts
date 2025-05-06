@@ -4,7 +4,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { GatewayIntentBits, MessageFlags, Partials } from "discord.js"
+import {
+  BaseInteraction,
+  DiscordAPIError,
+  GatewayIntentBits,
+  Interaction,
+  MessageFlags,
+  Partials,
+} from "discord.js"
 import { drizzle } from "drizzle-orm/better-sqlite3"
 import { migrate } from "drizzle-orm/better-sqlite3/migrator"
 import d from "fluent-commands"
@@ -44,8 +51,19 @@ const bot = d
   .errorHandler((context) => {
     console.log(context)
 
-    if (!context.interaction?.isRepliable()) {
+    let interaction: Interaction | BaseInteraction | undefined =
+      context.interaction
+    if (context.handlerParameters?.[0] instanceof BaseInteraction) {
+      interaction ??= context.handlerParameters[0]
+    }
+
+    if (!interaction?.isRepliable()) {
       return
+    }
+
+    let footer = ""
+    if (context.error instanceof DiscordAPIError) {
+      footer = `\n-# ${context.error.name} ${context.error.message}`
     }
 
     const reply = {
@@ -54,18 +72,19 @@ const bot = d
         d
           .container(
             d.text(`# An error occurred
-An error occurred while handling this interaction. Please ensure that the bot has the necessary permissions to perform its actions. If the permissions are setup correctly, feel free to open an issue on GitHub or message @lucasfloof on Discord directly.`),
+An error occurred while handling this interaction. Please ensure that the bot has the necessary permissions to perform its actions. **The bot has to be manually given the Set Voice Channel Status permission**.
+If the permissions are setup correctly, feel free to open an issue on GitHub or message @lucasfloof on Discord directly.${footer}`),
           )
           .build(),
       ],
     }
 
-    if (context.interaction.replied) {
-      context.interaction.followUp(reply).catch(console.error)
+    if (interaction.replied) {
+      interaction.followUp(reply).catch(console.error)
       return
     }
 
-    context.interaction.reply(reply).catch(console.error)
+    interaction.reply(reply).catch(console.error)
   })
   .register()
 
