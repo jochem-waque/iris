@@ -26,11 +26,11 @@ export const LastLeave = d
       return
     }
 
-    await setVoiceChannelStatus(oldState.channel, null)
-
     const [old] = await Database.delete(messageTable)
       .where(eq(messageTable.voice_id, oldState.channel.id))
       .returning()
+
+    await setVoiceChannelStatus(oldState.channel, null)
 
     await deleteOldMessage(newState.guild, old)
   })
