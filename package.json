@@ -30,7 +30,7 @@
     "discord.js": "^14.19.3",
     "drizzle-orm": "^0.43.1",
     "fluent-commands": "2.0.0-pre.2025-05-02.sha-6f89ac09",
-    "zod": "^3.24.3"
+    "zod": "^3.24.4"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.9",
@@ -42,14 +42,14 @@
     "@tsconfig/strictest": "^2.0.5",
     "@types/better-sqlite3": "^7.6.13",
     "@types/eslint-config-prettier": "^6.11.3",
-    "@types/node": "^22.15.3",
-    "drizzle-kit": "^0.31.0",
+    "@types/node": "^22.15.12",
+    "drizzle-kit": "^0.31.1",
     "eslint": "^9.26.0",
     "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.31.1"
+    "typescript-eslint": "^8.32.0"
   },
   "prettier": {
     "semi": false,
