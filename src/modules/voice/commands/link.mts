@@ -8,6 +8,7 @@ import {
   channelMention,
   ChannelType,
   Colors,
+  heading,
   InteractionContextType,
   MessageFlags,
   PermissionFlagsBits,
@@ -41,8 +42,10 @@ export const Link = d
         components: [
           d
             .container(
-              d.text(`# Channel unlinked
-${channelMention(voice.id)} is now no longer linked to a separate text channel.`),
+              d.text(heading("Channel unlinked")),
+              d.text(
+                `${channelMention(voice.id)} is now no longer linked to a separate text channel.`,
+              ),
             )
             .accent(Colors.Red)
             .build(),
@@ -67,8 +70,10 @@ ${channelMention(voice.id)} is now no longer linked to a separate text channel.`
       components: [
         d
           .container(
-            d.text(`# Channel linked
-${channelMention(voice.id)} is now linked to ${channelMention(text.id)}!`),
+            d.text(heading("Channel linked")),
+            d.text(
+              `${channelMention(voice.id)} is now linked to ${channelMention(text.id)}!`,
+            ),
           )
           .accent(Colors.Green)
           .build(),

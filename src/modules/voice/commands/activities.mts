@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { MessageFlags } from "discord.js"
+import { heading, MessageFlags } from "discord.js"
 import d from "fluent-commands"
 import { removeActivityDropdown } from "../components/removeActivityDropdown.mjs"
 
@@ -23,8 +23,10 @@ export const Activities = d
           components: [
             d
               .container(
-                d.text(`# Remove activities
-Select the activities you'd like to remove from the voice channel activity dropdown.`),
+                d.text(heading("Remove activities")),
+                d.text(
+                  "Select the activities you'd like to remove from the voice channel activity dropdown.",
+                ),
                 d.row(await removeActivityDropdown(interaction.guild)),
               )
               .build(),

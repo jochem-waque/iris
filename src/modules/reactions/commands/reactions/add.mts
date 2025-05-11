@@ -7,6 +7,7 @@
 import {
   Colors,
   DiscordAPIError,
+  heading,
   MessageFlags,
   RESTJSONErrorCodes,
 } from "discord.js"
@@ -39,8 +40,8 @@ export const Add = d
         components: [
           d
             .container(
-              d.text(`# No message found
-Couldn't find a message to add reactions to!`),
+              d.text(heading("No message found")),
+              d.text("Couldn't find a message to add reactions to!"),
             )
             .accent(Colors.Red)
             .build(),
@@ -55,8 +56,8 @@ Couldn't find a message to add reactions to!`),
       components: [
         d
           .container(
-            d.text(`# Adding reactions
-Adding reactions to ${first.url}`),
+            d.text(heading("Adding reactions")),
+            d.text(`Adding reactions to ${first.url}`),
           )
           .accent(Colors.Green)
           .build(),
@@ -81,8 +82,10 @@ Adding reactions to ${first.url}`),
         components: [
           d
             .container(
-              d.text(`# Adding reactions
-I don't have permission to add reactions to ${first.url}!`),
+              d.text(heading("Couldn't add reactions")),
+              d.text(
+                `I don't have permission to add reactions to ${first.url}!`,
+              ),
             )
             .accent(Colors.Red)
             .build(),

@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Guild, MessageFlags, unorderedList } from "discord.js"
+import { Guild, heading, MessageFlags, unorderedList } from "discord.js"
 import { desc, eq, inArray } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -44,8 +44,12 @@ export const RemoveActivityDropdown = d
         d
           .container(
             d.row(dropdown),
-            d.text(`# Removed ${deleted.length} ${deleted.length === 1 ? "entry" : "entries"}
-  ${unorderedList(deleted.map((entry) => entry.label))}`),
+            d.text(
+              heading(
+                `Removed ${deleted.length} ${deleted.length === 1 ? "entry" : "entries"}`,
+              ),
+            ),
+            d.text(unorderedList(deleted.map((entry) => entry.label))),
           )
           .build(),
       ],

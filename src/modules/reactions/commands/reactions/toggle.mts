@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, MessageFlags } from "discord.js"
+import { Colors, heading, MessageFlags } from "discord.js"
 import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../../index.mjs"
@@ -37,8 +37,8 @@ export const Toggle = d
         components: [
           d
             .container(
-              d.text(`# Reactions enabled
-Reactions will now be added to messages that ping you!`),
+              d.text(heading("Reactions enabled")),
+              d.text("Reactions will now be added to messages that ping you!"),
             )
             .accent(Colors.Green)
             .build(),
@@ -52,8 +52,10 @@ Reactions will now be added to messages that ping you!`),
       components: [
         d
           .container(
-            d.text(`# Reactions disabled
-Reactions will no longer be added to messages that ping you`),
+            d.text(heading("Reactions disabled")),
+            d.text(
+              "Reactions will no longer be added to messages that ping you",
+            ),
           )
           .accent(Colors.Red)
           .build(),

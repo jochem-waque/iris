@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { MessageFlags, unorderedList } from "discord.js"
+import { heading, MessageFlags, unorderedList } from "discord.js"
 import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -61,12 +61,12 @@ export function pingsMessage(
     components: [
       d
         .container(
-          d.text(`# Join pings
-${pingsTexts("join", guildConfig)}`),
+          d.text(heading("Join pings")),
+          d.text(pingsTexts("join", guildConfig)),
           d.row(joinPingSettings(guildConfig, memberConfig)),
           d.separator(),
-          d.text(`# Streaming pings
-${pingsTexts("streaming", guildConfig)}`),
+          d.text(heading("Streaming pings")),
+          d.text(pingsTexts("streaming", guildConfig)),
           d.row(streamingPingSettings(guildConfig, memberConfig)),
         )
         .build(),

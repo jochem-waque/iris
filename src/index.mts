@@ -6,11 +6,14 @@
 
 import {
   BaseInteraction,
+  bold,
   DiscordAPIError,
   GatewayIntentBits,
+  heading,
   Interaction,
   MessageFlags,
   Partials,
+  subtext,
 } from "discord.js"
 import { drizzle } from "drizzle-orm/better-sqlite3"
 import { migrate } from "drizzle-orm/better-sqlite3/migrator"
@@ -61,9 +64,11 @@ const bot = d
       return
     }
 
-    let footer = ""
+    const footer = []
     if (context.error instanceof DiscordAPIError) {
-      footer = `\n-# ${context.error.name} ${context.error.message}`
+      footer.push(
+        d.text(subtext(`${context.error.name} ${context.error.message}`)),
+      )
     }
 
     const reply = {
@@ -71,9 +76,14 @@ const bot = d
       components: [
         d
           .container(
-            d.text(`# An error occurred
-An error occurred while handling this interaction. Please ensure that the bot has the necessary permissions to perform its actions. **The bot has to be manually given the Set Voice Channel Status permission**.
-If the permissions are setup correctly, feel free to open an issue on GitHub or message @lucasfloof on Discord directly.${footer}`),
+            d.text(heading("An error occurred")),
+            d.text(
+              `An error occurred while handling this interaction. Please ensure that the bot has the necessary permissions to perform its actions. ${bold("The bot has to be manually given the Set Voice Channel Status permission")}.`,
+            ),
+            d.text(
+              "If the permissions are setup correctly, feel free to open an issue on GitHub or message @lucasfloof on Discord directly.",
+            ),
+            ...footer,
           )
           .build(),
       ],

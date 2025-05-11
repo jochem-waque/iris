@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, MessageFlags } from "discord.js"
+import { Colors, heading, MessageFlags } from "discord.js"
 import d from "fluent-commands"
 
 export const Remove = d
@@ -17,8 +17,10 @@ export const Remove = d
         components: [
           d
             .container(
-              d.text(`# Can't remove reactions
-You can't remove reactions from messages that aren't yours!`),
+              d.text(heading("Can't remove reactions")),
+              d.text(
+                "You can't remove reactions from messages that aren't yours!",
+              ),
             )
             .accent(Colors.Red)
             .build(),

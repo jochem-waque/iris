@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, MessageFlags } from "discord.js"
+import { Colors, heading, MessageFlags } from "discord.js"
 import d from "fluent-commands"
 import { Emojis } from "../events/reactOnMention.mjs"
 
@@ -18,8 +18,8 @@ export const Add = d
         components: [
           d
             .container(
-              d.text(`# Can't add reactions
-You can't add reactions to messages that aren't yours!`),
+              d.text(heading("Can't add reactions")),
+              d.text("You can't add reactions to messages that aren't yours!"),
             )
             .accent(Colors.Red)
             .build(),

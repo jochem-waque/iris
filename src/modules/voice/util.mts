@@ -11,6 +11,8 @@ import {
   ComponentType,
   DiscordAPIError,
   Guild,
+  heading,
+  HeadingLevel,
   InteractionUpdateOptions,
   Message,
   MessageActionRowComponent,
@@ -199,15 +201,23 @@ export async function voiceStatus({
     currentNoise.setDefault(true)
   }
 
+  const mentionText = []
+  if (mention) {
+    mentionText.push(d.text(userMention(mention)))
+  }
+
   const messageOptions: MessageCreateOptions = {
     content: "",
     flags: MessageFlags.IsComponentsV2,
     components: [
       d
         .container(
-          d.text(`# Voice channel topic
-Please make sure that the activity and noise level that you select are representative of what is happening in the VC, and not relevant to just you or your stream.${mention ? `\n${userMention(mention)}` : ""}
-## Channel`),
+          d.text(heading("Voice channel topic")),
+          d.text(
+            "Please make sure that the activity and noise level that you select are representative of what is happening in the VC, and not relevant to just you or your stream.",
+          ),
+          ...mentionText,
+          d.text(heading("Channel", HeadingLevel.Two)),
           d.text(channelMention(voiceId ?? "")).id(1),
           d.row(activityDropdown),
           d.row(noiseDropdown),
