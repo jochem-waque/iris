@@ -19,6 +19,9 @@ import {
   RESTJSONErrorCodes,
   Snowflake,
   StringSelectMenuOptionBuilder,
+  subtext,
+  time,
+  TimestampStyles,
   TopLevelComponent,
   userMention,
   VoiceBasedChannel,
@@ -208,6 +211,11 @@ Please make sure that the activity and noise level that you select are represent
           d.text(channelMention(voiceId ?? "")).id(1),
           d.row(activityDropdown),
           d.row(noiseDropdown),
+          d.text(
+            subtext(
+              `Last updated ${time(new Date(), TimestampStyles.RelativeTime)}`,
+            ),
+          ),
         )
         .build(),
     ],
