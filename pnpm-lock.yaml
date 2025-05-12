@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       better-sqlite3:
-        specifier: ^11.10.0
+        specifier: ^11.9.0
         version: 11.10.0
       camelcase-keys:
         specifier: ^9.1.3
