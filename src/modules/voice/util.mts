@@ -50,7 +50,8 @@ import { ServerMaxJoinPingCooldown } from "./components/serverMaxJoinPingCooldow
 import { ServerMaxStreamingPingCooldown } from "./components/serverMaxStreamingPingCooldown.mjs"
 import { ServerStreamingPingOptOut } from "./components/serverStreamingPingOptOut.mjs"
 
-const TopicUpdatedAt = new Map<string, number>()
+export const TopicUpdatedAt = new Map<string, number>()
+
 const JoinCooldowns = new Set<string>()
 const StreamingCooldowns = new Set<string>()
 

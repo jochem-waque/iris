@@ -11,6 +11,7 @@ import { messageTable } from "../../../schema.mjs"
 import {
   deleteOldMessage,
   setVoiceChannelStatus,
+  TopicUpdatedAt,
   voiceChannelStates,
 } from "../util.mjs"
 
@@ -25,6 +26,8 @@ export const LastLeave = d
     if (states.size > 0) {
       return
     }
+
+    TopicUpdatedAt.delete(oldState.channel.id)
 
     const [old] = await Database.delete(messageTable)
       .where(eq(messageTable.voice_id, oldState.channel.id))
