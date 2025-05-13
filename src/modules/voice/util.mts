@@ -50,6 +50,7 @@ import { ServerMaxJoinPingCooldown } from "./components/serverMaxJoinPingCooldow
 import { ServerMaxStreamingPingCooldown } from "./components/serverMaxStreamingPingCooldown.mjs"
 import { ServerStreamingPingOptOut } from "./components/serverStreamingPingOptOut.mjs"
 
+const TopicUpdatedAt = new Map<string, number>()
 const JoinCooldowns = new Set<string>()
 const StreamingCooldowns = new Set<string>()
 
@@ -161,13 +162,17 @@ export async function voiceStatus({
     }
   }
 
-  // FIXME wait for discord.js fix
-  activity ??= selectedValue(oldMessage?.resolveComponent(ActivityDropdown.id))
-  noise ??= selectedValue(oldMessage?.resolveComponent(NoiseDropdown.id))
   voiceId ??= text(findComponentById(oldMessage?.components ?? [], 1))?.slice(
     2,
     -1,
   )
+
+  if (voiceId && (activity || noise)) {
+    TopicUpdatedAt.set(voiceId, Date.now())
+  }
+
+  activity ??= selectedValue(oldMessage?.resolveComponent(ActivityDropdown.id))
+  noise ??= selectedValue(oldMessage?.resolveComponent(NoiseDropdown.id))
 
   const activities = await Database.select()
     .from(activitiesTable)
@@ -206,6 +211,18 @@ export async function voiceStatus({
     mentionText.push(d.text(userMention(mention)))
   }
 
+  const footer = []
+  const lastUpdatedAt = TopicUpdatedAt.get(voiceId ?? "")
+  if (lastUpdatedAt) {
+    footer.push(
+      d.text(
+        subtext(
+          `Last updated ${time(new Date(lastUpdatedAt), TimestampStyles.RelativeTime)}`,
+        ),
+      ),
+    )
+  }
+
   const messageOptions: MessageCreateOptions = {
     content: "",
     flags: MessageFlags.IsComponentsV2,
@@ -221,11 +238,7 @@ export async function voiceStatus({
           d.text(channelMention(voiceId ?? "")).id(1),
           d.row(activityDropdown),
           d.row(noiseDropdown),
-          d.text(
-            subtext(
-              `Last updated ${time(new Date(), TimestampStyles.RelativeTime)}`,
-            ),
-          ),
+          ...footer,
         )
         .build(),
     ],
