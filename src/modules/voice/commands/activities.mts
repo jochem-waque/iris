@@ -27,7 +27,7 @@ export const Activities = d
                 d.text(
                   "Select the activities you'd like to remove from the voice channel activity dropdown.",
                 ),
-                d.row(await removeActivityDropdown(interaction.guild)),
+                d.row(removeActivityDropdown(interaction.guild)),
               )
               .build(),
           ],

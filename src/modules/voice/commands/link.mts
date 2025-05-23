@@ -35,7 +35,7 @@ export const Link = d
   .contexts(InteractionContextType.Guild)
   .handler(async (interaction, { voice, text }) => {
     if (!text) {
-      await Database.delete(linkTable).where(eq(linkTable.voice_id, voice.id))
+      Database.delete(linkTable).where(eq(linkTable.voice_id, voice.id)).run()
 
       await interaction.reply({
         flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
@@ -55,7 +55,7 @@ export const Link = d
       return
     }
 
-    await Database.insert(linkTable)
+    Database.insert(linkTable)
       .values({
         text_id: text.id,
         voice_id: voice.id,
@@ -64,6 +64,7 @@ export const Link = d
         target: linkTable.voice_id,
         set: { text_id: text.id },
       })
+      .run()
 
     await interaction.reply({
       flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,

@@ -22,7 +22,7 @@ export const NoiseDropdown = d
       return
     }
 
-    const { messageOptions, status, channelId } = await voiceStatus({
+    const { messageOptions, status, channelId } = voiceStatus({
       force: true,
       noise: interaction.values[0],
       oldMessage: interaction.message,

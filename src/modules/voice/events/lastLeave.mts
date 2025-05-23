@@ -29,9 +29,10 @@ export const LastLeave = d
 
     TopicUpdatedAt.delete(oldState.channel.id)
 
-    const [old] = await Database.delete(messageTable)
+    const old = Database.delete(messageTable)
       .where(eq(messageTable.voice_id, oldState.channel.id))
       .returning()
+      .get()
 
     await setVoiceChannelStatus(oldState.channel, null)
 

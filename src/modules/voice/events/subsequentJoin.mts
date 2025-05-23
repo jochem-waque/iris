@@ -49,48 +49,41 @@ export const SubsequentJoin = d
       mention: newState.id,
     }
 
-    await Database.transaction(async (tx) => {
-      const [old] = await tx
-        .select()
-        .from(messageTable)
-        .where(eq(messageTable.voice_id, voiceChannel.id))
+    const old = Database.select()
+      .from(messageTable)
+      .where(eq(messageTable.voice_id, voiceChannel.id))
+      .get()
 
-      const oldMessage = await fetchOldMessage(newState.guild, old)
-      if (oldMessage) {
-        options.oldMessage = oldMessage
+    const oldMessage = await fetchOldMessage(newState.guild, old)
+    if (oldMessage) {
+      options.oldMessage = oldMessage
+    }
+
+    const { messageOptions } = voiceStatus(options)
+    if (!messageOptions) {
+      return
+    }
+
+    const channel = await getTextChannel(voiceChannel)
+
+    let message
+    try {
+      message = await channel.send(messageOptions)
+    } catch (e) {
+      if (
+        !(e instanceof DiscordAPIError) ||
+        e.code !== RESTJSONErrorCodes.MissingAccess
+      ) {
+        throw e
       }
 
-      const { messageOptions } = await voiceStatus(options)
-      if (!messageOptions) {
-        return
-      }
+      return
+    }
 
-      const channel = await getTextChannel(voiceChannel)
+    Database.update(messageTable)
+      .set({ message_id: message.id })
+      .where(eq(messageTable.voice_id, voiceChannel.id))
+      .run()
 
-      let message
-      try {
-        message = await channel.send(messageOptions)
-      } catch (e) {
-        if (
-          !(e instanceof DiscordAPIError) ||
-          e.code !== RESTJSONErrorCodes.MissingAccess
-        ) {
-          throw e
-        }
-
-        return
-      }
-
-      await tx
-        .delete(messageTable)
-        .where(eq(messageTable.voice_id, voiceChannel.id))
-
-      await tx.insert(messageTable).values({
-        channel_id: message.channelId,
-        message_id: message.id,
-        voice_id: voiceChannel.id,
-      })
-
-      await oldMessage?.delete()
-    })
+    await oldMessage?.delete()
   })

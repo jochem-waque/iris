@@ -17,7 +17,7 @@ export const ReactOnMention = d
       return
     }
 
-    const users = await Database.select().from(mentionTable)
+    const users = Database.select().from(mentionTable).all()
 
     const clone = message.mentions.parsedUsers.clone()
     clone.delete(message.author.id)

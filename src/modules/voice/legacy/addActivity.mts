@@ -28,19 +28,20 @@ export const AddActivity = modal({
       return
     }
 
-    const [newActivity] = await Database.insert(activitiesTable)
+    const newActivity = Database.insert(activitiesTable)
       .values({ label: name, guild_id: interaction.guildId })
       .onConflictDoUpdate({
         target: [activitiesTable.label, activitiesTable.guild_id],
         set: { last_used: new Date() },
       })
       .returning()
+      .get()
 
     if (!newActivity) {
       return
     }
 
-    const { messageOptions, status, channelId } = await voiceStatus({
+    const { messageOptions, status, channelId } = voiceStatus({
       force: true,
       activity: newActivity.id.toString(),
       oldMessage: interaction.message,

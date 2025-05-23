@@ -21,15 +21,16 @@ export const ServerJoinPingOptOut = d
       return
     }
 
-    const [guildConfig] = await Database.transaction(async (tx) => {
-      const [old] = await tx
+    const guildConfig = Database.transaction((tx) => {
+      const old = tx
         .select()
         .from(guildConfigTable)
         .where(eq(guildConfigTable.guild_id, interaction.guildId))
         .orderBy(desc(guildConfigTable.timestamp))
         .limit(1)
+        .get()
 
-      return await tx
+      return tx
         .insert(guildConfigTable)
         .values({
           guild_id: interaction.guildId,
@@ -41,6 +42,7 @@ export const ServerJoinPingOptOut = d
           allow_join_opt_out: value === "true",
         })
         .returning()
+        .get()
     })
 
     await interaction.update(serverSettingsMessage(guildConfig))

@@ -25,11 +25,12 @@ export const Server = d
           return
         }
 
-        const [guildConfig] = await Database.select()
+        const guildConfig = Database.select()
           .from(guildConfigTable)
           .where(eq(guildConfigTable.guild_id, interaction.guildId))
           .orderBy(desc(guildConfigTable.timestamp))
           .limit(1)
+          .get()
 
         await interaction.reply(serverSettingsMessage(guildConfig))
       }),

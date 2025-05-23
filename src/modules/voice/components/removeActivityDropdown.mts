@@ -26,7 +26,7 @@ export const RemoveActivityDropdown = d
       return
     }
 
-    const deleted = await Database.delete(activitiesTable)
+    const deleted = Database.delete(activitiesTable)
       .where(
         inArray(
           activitiesTable.id,
@@ -34,8 +34,9 @@ export const RemoveActivityDropdown = d
         ),
       )
       .returning()
+      .all()
 
-    const dropdown = await removeActivityDropdown(interaction.guild)
+    const dropdown = removeActivityDropdown(interaction.guild)
 
     await interaction.update({
       content: "",
@@ -56,12 +57,13 @@ export const RemoveActivityDropdown = d
     })
   })
 
-export async function removeActivityDropdown(guild: Guild) {
-  const activities = await Database.select()
+export function removeActivityDropdown(guild: Guild) {
+  const activities = Database.select()
     .from(activitiesTable)
     .where(eq(activitiesTable.guild_id, guild.id))
     .orderBy(desc(activitiesTable.last_used))
     .limit(25)
+    .all()
 
   // TODO empty with() feels off
   const dropdown = RemoveActivityDropdown.with()

@@ -40,7 +40,7 @@ export const FirstJoin = d
       return
     }
 
-    const { messageOptions } = await voiceStatus({
+    const { messageOptions } = voiceStatus({
       source: "join",
       force: true,
       voiceId: newState.channel.id,
@@ -52,32 +52,37 @@ export const FirstJoin = d
 
     const channel = await getTextChannel(voiceChannel)
 
-    await Database.transaction(async (tx) => {
-      const [old] = await tx
+    let message
+    try {
+      message = await channel.send(messageOptions)
+    } catch (e) {
+      if (
+        !(e instanceof DiscordAPIError) ||
+        e.code !== RESTJSONErrorCodes.MissingAccess
+      ) {
+        throw e
+      }
+
+      return
+    }
+
+    const old = Database.transaction((tx) => {
+      const old = tx
         .delete(messageTable)
         .where(eq(messageTable.voice_id, voiceChannel.id))
         .returning()
+        .get()
 
-      let message
-      try {
-        message = await channel.send(messageOptions)
-      } catch (e) {
-        if (
-          !(e instanceof DiscordAPIError) ||
-          e.code !== RESTJSONErrorCodes.MissingAccess
-        ) {
-          throw e
-        }
+      tx.insert(messageTable)
+        .values({
+          channel_id: message.channelId,
+          message_id: message.id,
+          voice_id: voiceChannel.id,
+        })
+        .run()
 
-        return
-      }
-
-      await tx.insert(messageTable).values({
-        channel_id: message.channelId,
-        message_id: message.id,
-        voice_id: voiceChannel.id,
-      })
-
-      await deleteOldMessage(channel.guild, old)
+      return old
     })
+
+    await deleteOldMessage(channel.guild, old)
   })

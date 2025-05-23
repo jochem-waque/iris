@@ -31,11 +31,12 @@ export const ActivityDropdown = d
       return
     }
 
-    await Database.update(activitiesTable)
+    Database.update(activitiesTable)
       .set({ last_used: new Date() })
       .where(eq(activitiesTable.id, parseInt(interaction.values[0])))
+      .run()
 
-    const { messageOptions, status, channelId } = await voiceStatus({
+    const { messageOptions, status, channelId } = voiceStatus({
       force: true,
       activity: interaction.values[0],
       oldMessage: interaction.message,

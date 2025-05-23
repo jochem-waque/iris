@@ -71,13 +71,13 @@ type VoiceStatus = {
   channelId: string | undefined
 }
 
-export async function voiceStatus(
+export function voiceStatus(
   options: VoiceStatusMessageOptions,
-): Promise<Partial<VoiceStatus>>
-export async function voiceStatus(
+): Partial<VoiceStatus>
+export function voiceStatus(
   options: VoiceStatusMessageOptions & { force: true },
-): Promise<VoiceStatus>
-export async function voiceStatus({
+): VoiceStatus
+export function voiceStatus({
   force,
   voiceId,
   guild,
@@ -107,30 +107,30 @@ export async function voiceStatus({
   }
 
   if (mention) {
-    const [guildConfig, memberConfig] = await Database.transaction(
-      async (tx) => {
-        const [guildConfig] = await tx
-          .select()
-          .from(guildConfigTable)
-          .where(eq(guildConfigTable.guild_id, guild.id))
-          .orderBy(desc(guildConfigTable.timestamp))
-          .limit(1)
+    const [guildConfig, memberConfig] = Database.transaction((tx) => {
+      const guildConfig = tx
+        .select()
+        .from(guildConfigTable)
+        .where(eq(guildConfigTable.guild_id, guild.id))
+        .orderBy(desc(guildConfigTable.timestamp))
+        .limit(1)
+        .get()
 
-        const [memberConfig] = await tx
-          .select()
-          .from(memberConfigTable)
-          .where(
-            and(
-              eq(memberConfigTable.guild_id, guild.id),
-              eq(memberConfigTable.user_id, mention),
-            ),
-          )
-          .orderBy(desc(memberConfigTable.timestamp))
-          .limit(1)
+      const memberConfig = tx
+        .select()
+        .from(memberConfigTable)
+        .where(
+          and(
+            eq(memberConfigTable.guild_id, guild.id),
+            eq(memberConfigTable.user_id, mention),
+          ),
+        )
+        .orderBy(desc(memberConfigTable.timestamp))
+        .limit(1)
+        .get()
 
-        return [guildConfig, memberConfig]
-      },
-    )
+      return [guildConfig, memberConfig]
+    })
 
     const { member } =
       source === "join"
@@ -175,11 +175,12 @@ export async function voiceStatus({
   activity ??= selectedValue(oldMessage?.resolveComponent(ActivityDropdown.id))
   noise ??= selectedValue(oldMessage?.resolveComponent(NoiseDropdown.id))
 
-  const activities = await Database.select()
+  const activities = Database.select()
     .from(activitiesTable)
     .where(eq(activitiesTable.guild_id, guild.id))
     .orderBy(desc(activitiesTable.last_used))
     .limit(24)
+    .all()
 
   const options = activities.map(({ id, label }) =>
     d.select().stringOption(id.toString()).builder.setLabel(label),
@@ -294,10 +295,11 @@ export async function voiceStateIsBot(state: VoiceState) {
 }
 
 export async function getTextChannel(channel: VoiceBasedChannel) {
-  const [link] = await Database.select()
+  const link = Database.select()
     .from(linkTable)
     .where(eq(linkTable.voice_id, channel.id))
     .limit(1)
+    .get()
 
   if (!link) {
     return channel

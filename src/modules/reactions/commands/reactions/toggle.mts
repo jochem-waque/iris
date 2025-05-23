@@ -13,20 +13,22 @@ import { mentionTable } from "../../../../schema.mjs"
 export const Toggle = d
   .subcommand("Toggle whether reactions are added to messages that ping you")
   .handler(async (interaction) => {
-    const stored = await Database.transaction(async (tx) => {
-      const [existing] = await tx
+    const stored = Database.transaction((tx) => {
+      const existing = tx
         .delete(mentionTable)
         .where(eq(mentionTable.user_id, interaction.user.id))
         .returning()
+        .get()
 
       if (existing) {
         return false
       }
 
-      const [inserted] = await tx
+      const inserted = tx
         .insert(mentionTable)
         .values({ user_id: interaction.user.id })
         .returning()
+        .get()
 
       return inserted !== undefined
     })

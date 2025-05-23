@@ -22,30 +22,30 @@ export const Pings = d
           return
         }
 
-        const [guildConfig, memberConfig] = await Database.transaction(
-          async (tx) => {
-            const [guildConfig] = await tx
-              .select()
-              .from(guildConfigTable)
-              .where(eq(guildConfigTable.guild_id, interaction.guildId))
-              .orderBy(desc(guildConfigTable.timestamp))
-              .limit(1)
+        const [guildConfig, memberConfig] = Database.transaction((tx) => {
+          const guildConfig = tx
+            .select()
+            .from(guildConfigTable)
+            .where(eq(guildConfigTable.guild_id, interaction.guildId))
+            .orderBy(desc(guildConfigTable.timestamp))
+            .limit(1)
+            .get()
 
-            const [memberConfig] = await tx
-              .select()
-              .from(memberConfigTable)
-              .where(
-                and(
-                  eq(memberConfigTable.guild_id, interaction.guildId),
-                  eq(memberConfigTable.user_id, interaction.user.id),
-                ),
-              )
-              .orderBy(desc(memberConfigTable.timestamp))
-              .limit(1)
+          const memberConfig = tx
+            .select()
+            .from(memberConfigTable)
+            .where(
+              and(
+                eq(memberConfigTable.guild_id, interaction.guildId),
+                eq(memberConfigTable.user_id, interaction.user.id),
+              ),
+            )
+            .orderBy(desc(memberConfigTable.timestamp))
+            .limit(1)
+            .get()
 
-            return [guildConfig, memberConfig]
-          },
-        )
+          return [guildConfig, memberConfig]
+        })
 
         await interaction.reply(pingsMessage(guildConfig, memberConfig))
       }),
