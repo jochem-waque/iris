@@ -32,7 +32,7 @@ export const messageTable = sqliteTable("message", {
   id: int().primaryKey(),
   channel_id: text().notNull(),
   message_id: text().notNull().unique(),
-  voice_id: text().notNull().unique(),
+  voice_id: text().notNull(),
 })
 
 // Links between text and voice channels

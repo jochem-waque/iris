@@ -9,7 +9,7 @@ import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
 import {
-  deleteOldMessage,
+  deleteOldMessages,
   setVoiceChannelStatus,
   TopicUpdatedAt,
   voiceChannelStates,
@@ -32,9 +32,9 @@ export const LastLeave = d
     const old = Database.delete(messageTable)
       .where(eq(messageTable.voice_id, oldState.channel.id))
       .returning()
-      .get()
+      .all()
 
     await setVoiceChannelStatus(oldState.channel, null)
 
-    await deleteOldMessage(newState.guild, old)
+    await deleteOldMessages(newState.guild, old)
   })

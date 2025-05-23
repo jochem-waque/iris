@@ -1,0 +1,1 @@
+DROP INDEX `message_voice_id_unique`;

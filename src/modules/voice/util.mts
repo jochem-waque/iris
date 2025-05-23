@@ -322,43 +322,29 @@ export async function getTextChannel(channel: VoiceBasedChannel) {
   return linkedChannel?.isTextBased() ? linkedChannel : channel
 }
 
-export async function deleteOldMessage(
+export async function deleteOldMessages(
   guild: Guild,
-  old?: typeof messageTable.$inferSelect,
+  old: (typeof messageTable.$inferSelect)[],
 ) {
-  if (!old) {
-    return
-  }
-
-  let channel
-  try {
-    channel = await guild.channels.fetch(old.channel_id)
-  } catch (e) {
-    if (
-      !(e instanceof DiscordAPIError) ||
-      e.code !== RESTJSONErrorCodes.UnknownChannel
-    ) {
-      throw e
+  for (const message of old) {
+    let channel
+    try {
+      channel = await guild.channels.fetch(message.channel_id)
+    } catch (e) {
+      console.error(e)
+      continue
     }
 
-    return
-  }
-
-  if (!channel?.isTextBased()) {
-    return
-  }
-
-  try {
-    await channel.messages.delete(old.message_id)
-  } catch (e) {
-    if (
-      !(e instanceof DiscordAPIError) ||
-      e.code !== RESTJSONErrorCodes.UnknownMessage
-    ) {
-      throw e
+    if (!channel?.isTextBased()) {
+      continue
     }
 
-    return
+    try {
+      await channel.messages.delete(message.message_id)
+    } catch (e) {
+      console.error(e)
+      continue
+    }
   }
 }
 

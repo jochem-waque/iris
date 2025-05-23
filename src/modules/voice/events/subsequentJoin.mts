@@ -4,12 +4,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ChannelType, DiscordAPIError, RESTJSONErrorCodes } from "discord.js"
-import { eq } from "drizzle-orm"
+import { ChannelType } from "discord.js"
+import { and, desc, eq, not, SQL } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
 import {
+  deleteOldMessages,
   fetchOldMessage,
   getTextChannel,
   voiceChannelStates,
@@ -41,20 +42,20 @@ export const SubsequentJoin = d
       return
     }
 
-    const voiceChannel = newState.channel
     const options: VoiceStatusMessageOptions = {
       source: "join",
-      voiceId: voiceChannel.id,
+      voiceId: newState.channel.id,
       guild: newState.guild,
       mention: newState.id,
     }
 
-    const old = Database.select()
+    const last = Database.select()
       .from(messageTable)
-      .where(eq(messageTable.voice_id, voiceChannel.id))
+      .where(eq(messageTable.voice_id, newState.channel.id))
+      .orderBy(desc(messageTable.message_id))
       .get()
 
-    const oldMessage = await fetchOldMessage(newState.guild, old)
+    const oldMessage = await fetchOldMessage(newState.guild, last)
     if (oldMessage) {
       options.oldMessage = oldMessage
     }
@@ -64,26 +65,33 @@ export const SubsequentJoin = d
       return
     }
 
-    const channel = await getTextChannel(voiceChannel)
+    const channel = await getTextChannel(newState.channel)
 
     let message
     try {
       message = await channel.send(messageOptions)
     } catch (e) {
-      if (
-        !(e instanceof DiscordAPIError) ||
-        e.code !== RESTJSONErrorCodes.MissingAccess
-      ) {
-        throw e
-      }
-
-      return
+      console.error(e)
     }
 
-    Database.update(messageTable)
-      .set({ message_id: message.id })
-      .where(eq(messageTable.voice_id, voiceChannel.id))
-      .run()
+    let condition: SQL | undefined = eq(
+      messageTable.voice_id,
+      newState.channel.id,
+    )
 
-    await oldMessage?.delete()
+    if (message) {
+      Database.insert(messageTable)
+        .values({
+          channel_id: message.channelId,
+          message_id: message.id,
+          voice_id: newState.channel.id,
+        })
+        .run()
+
+      condition = and(condition, not(eq(messageTable.message_id, message.id)))
+    }
+
+    const old = Database.delete(messageTable).where(condition).returning().all()
+
+    await deleteOldMessages(channel.guild, old)
   })
