@@ -53,6 +53,7 @@ export const SubsequentJoin = d
       .from(messageTable)
       .where(eq(messageTable.voice_id, newState.channel.id))
       .orderBy(desc(messageTable.message_id))
+      .limit(1)
       .get()
 
     const oldMessage = await fetchOldMessage(newState.guild, last)
