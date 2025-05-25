@@ -4,12 +4,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { heading, MessageFlags } from "discord.js"
+import {
+  ApplicationIntegrationType,
+  heading,
+  InteractionContextType,
+  MessageFlags,
+} from "discord.js"
 import d from "fluent-commands"
 import { removeActivityDropdown } from "../components/removeActivityDropdown.mjs"
 
 export const Activities = d
   .slashCommand("activities", "Commands related to voice channel activities")
+  .integrationTypes(ApplicationIntegrationType.GuildInstall)
+  .contexts(InteractionContextType.Guild)
   .subcommands({
     remove: d
       .subcommand("Remove voice channel activities from the dropdown menu")

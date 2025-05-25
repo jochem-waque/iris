@@ -4,13 +4,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Colors, heading, MessageFlags } from "discord.js"
+import {
+  ApplicationIntegrationType,
+  Colors,
+  heading,
+  InteractionContextType,
+  MessageFlags,
+} from "discord.js"
 import d from "fluent-commands"
 import { Emojis } from "../events/reactOnMention.mjs"
 
 export const Add = d
   .contextMenuCommand("Add reactions")
   .message()
+  .integrationTypes(ApplicationIntegrationType.GuildInstall)
+  .contexts(InteractionContextType.Guild)
   .handler(async (interaction) => {
     if (interaction.targetMessage.author.id !== interaction.user.id) {
       await interaction.reply({

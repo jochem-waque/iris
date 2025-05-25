@@ -4,7 +4,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { heading, MessageFlags, unorderedList } from "discord.js"
+import {
+  ApplicationIntegrationType,
+  heading,
+  InteractionContextType,
+  MessageFlags,
+  unorderedList,
+} from "discord.js"
 import { and, desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -14,6 +20,8 @@ import { streamingPingSettings } from "../components/streamingPingSettings.mjs"
 
 export const Pings = d
   .slashCommand("pings", "Commands related to pings")
+  .integrationTypes(ApplicationIntegrationType.GuildInstall)
+  .contexts(InteractionContextType.Guild)
   .subcommands({
     configure: d
       .subcommand("Configure ping-related settings")

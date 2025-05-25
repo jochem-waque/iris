@@ -4,13 +4,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { heading, HeadingLevel, MessageFlags, unorderedList } from "discord.js"
+import {
+  ApplicationIntegrationType,
+  heading,
+  HeadingLevel,
+  InteractionContextType,
+  MessageFlags,
+  unorderedList,
+} from "discord.js"
 import d from "fluent-commands"
 
 export const Guide = d
   .slashCommand(
     "guide",
     "Shows more in-depth information on how to use the bot",
+  )
+  .integrationTypes(
+    ApplicationIntegrationType.GuildInstall,
+    ApplicationIntegrationType.UserInstall,
+  )
+  .contexts(
+    InteractionContextType.BotDM,
+    InteractionContextType.Guild,
+    InteractionContextType.PrivateChannel,
   )
   .handler(async (interaction) => {
     await interaction.reply({

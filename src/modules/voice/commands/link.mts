@@ -5,6 +5,7 @@
  */
 
 import {
+  ApplicationIntegrationType,
   channelMention,
   ChannelType,
   Colors,
@@ -20,6 +21,8 @@ import { linkTable } from "../../../schema.mjs"
 
 export const Link = d
   .slashCommand("link", "Link a voice channel to a text channel, or unlink it")
+  .integrationTypes(ApplicationIntegrationType.GuildInstall)
+  .contexts(InteractionContextType.Guild)
   .options({
     voice: d
       .option("The voice channel")
@@ -32,7 +35,6 @@ export const Link = d
       .channelTypes(ChannelType.GuildText),
   })
   .defaultMemberPermissions(PermissionFlagsBits.ManageChannels)
-  .contexts(InteractionContextType.Guild)
   .handler(async (interaction, { voice, text }) => {
     if (!text) {
       Database.delete(linkTable).where(eq(linkTable.voice_id, voice.id)).run()

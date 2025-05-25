@@ -4,7 +4,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { heading, MessageFlags, PermissionFlagsBits } from "discord.js"
+import {
+  ApplicationIntegrationType,
+  heading,
+  InteractionContextType,
+  MessageFlags,
+  PermissionFlagsBits,
+} from "discord.js"
 import { desc, eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -16,6 +22,8 @@ import {
 
 export const Server = d
   .slashCommand("server", "Commands related to the server")
+  .integrationTypes(ApplicationIntegrationType.GuildInstall)
+  .contexts(InteractionContextType.Guild)
   .defaultMemberPermissions(PermissionFlagsBits.ManageChannels)
   .subcommands({
     pings: d

@@ -4,7 +4,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { heading, HeadingLevel, MessageFlags, unorderedList } from "discord.js"
+import {
+  ApplicationIntegrationType,
+  heading,
+  HeadingLevel,
+  InteractionContextType,
+  MessageFlags,
+  unorderedList,
+} from "discord.js"
 import d from "fluent-commands"
 import { Reactions } from "../../reactions/commands/reactions.mjs"
 import { Pings } from "../../voice/commands/pings.mjs"
@@ -12,6 +19,15 @@ import { Server } from "../../voice/commands/server.mjs"
 
 export const Info = d
   .slashCommand("info", "Displays information about the bot")
+  .integrationTypes(
+    ApplicationIntegrationType.GuildInstall,
+    ApplicationIntegrationType.UserInstall,
+  )
+  .contexts(
+    InteractionContextType.BotDM,
+    InteractionContextType.Guild,
+    InteractionContextType.PrivateChannel,
+  )
   .handler(async (interaction) => {
     await interaction.reply({
       flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
