@@ -21,11 +21,11 @@ importers:
         specifier: ^0.43.1
         version: 0.43.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)
       fluent-commands:
-        specifier: 2.0.0-pre.2025-05-10.sha-eb1c238a
-        version: 2.0.0-pre.2025-05-10.sha-eb1c238a(discord.js@14.19.3(bufferutil@4.0.9))
+        specifier: 2.0.0-pre.2025-05-25.sha-e00a66fe
+        version: 2.0.0-pre.2025-05-25.sha-e00a66fe(discord.js@14.19.3(bufferutil@4.0.9))
       zod:
-        specifier: ^3.25.24
-        version: 3.25.24
+        specifier: ^3.25.28
+        version: 3.25.28
     devDependencies:
       '@eslint/js':
         specifier: ^9.27.0
@@ -878,8 +878,8 @@ packages:
   flatted@3.3.3:
     resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
 
-  fluent-commands@2.0.0-pre.2025-05-10.sha-eb1c238a:
-    resolution: {integrity: sha512-UG3pcd7QLK42figIqIaLWBH4QN0ihZMYfRRujK3I7VH3TE9U4FoA7OGhEMIjnzLa5dotvzFOlahpZkIWdfrafQ==}
+  fluent-commands@2.0.0-pre.2025-05-25.sha-e00a66fe:
+    resolution: {integrity: sha512-OVqnINT4RZaxzXKul90JeCaVa4S78hdfbSyDvaYlf65aIV5nGiHqj8dXJLK3VdYFtOurksG1RLhDmeheLCwXGg==}
     engines: {node: '>=22'}
     peerDependencies:
       discord.js: ^14.18.0
@@ -1262,8 +1262,8 @@ packages:
   zlib-sync@0.1.10:
     resolution: {integrity: sha512-t7/pYg5tLBznL1RuhmbAt8rNp5tbhr+TSrJFnMkRtrGIaPJZ6Dc0uR4u3OoQI2d6cGlVI62E3Gy6gwkxyIqr/w==}
 
-  zod@3.25.24:
-    resolution: {integrity: sha512-E77RpEqxeBGBVbcK/5QKQsLM+3u6aN7pVgiGJENbwYfdsExPS/xyyUMfmeM3eY32LBCIjuzv6XU505sHn2t+Kw==}
+  zod@3.25.28:
+    resolution: {integrity: sha512-/nt/67WYKnr5by3YS7LroZJbtcCBurDKKPBPWWzaxvVCGuG/NOsiKkrjoOhI8mJ+SQUXEbUzeB3S+6XDUEEj7Q==}
 
 snapshots:
 
@@ -1969,7 +1969,7 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  fluent-commands@2.0.0-pre.2025-05-10.sha-eb1c238a(discord.js@14.19.3(bufferutil@4.0.9)):
+  fluent-commands@2.0.0-pre.2025-05-25.sha-e00a66fe(discord.js@14.19.3(bufferutil@4.0.9)):
     dependencies:
       discord.js: 14.19.3(bufferutil@4.0.9)
 
@@ -2296,4 +2296,4 @@ snapshots:
       nan: 2.22.2
     optional: true
 
-  zod@3.25.24: {}
+  zod@3.25.28: {}
