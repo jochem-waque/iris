@@ -10,7 +10,6 @@ import {
   DiscordAPIError,
   GatewayIntentBits,
   heading,
-  Interaction,
   MessageFlags,
   Partials,
   subtext,
@@ -27,7 +26,7 @@ export const Database = drizzle(Env.dbFileName)
 
 migrate(Database, { migrationsFolder: "./drizzle" })
 
-const bot = d
+let bot = d
   .bot({
     intents: [
       GatewayIntentBits.Guilds,
@@ -52,12 +51,20 @@ const bot = d
   .addModule(Voice)
   .addModule(Reactions)
   .errorHandler((context) => {
-    console.log(context)
+    let interaction: BaseInteraction | undefined
+    if ("interaction" in context) {
+      interaction = context.interaction
+    }
 
-    let interaction: Interaction | BaseInteraction | undefined =
-      context.interaction
-    if (context.handlerParameters?.[0] instanceof BaseInteraction) {
-      interaction ??= context.handlerParameters[0]
+    if (
+      "handlerParameters" in context &&
+      context.handlerParameters?.[0] instanceof BaseInteraction
+    ) {
+      interaction = context.handlerParameters[0]
+    }
+
+    if (!interaction) {
+      return
     }
 
     if (!interaction?.isRepliable()) {
@@ -98,4 +105,8 @@ const bot = d
   })
   .register()
 
-await bot.client.login(Env.botToken)
+if (Env.webhookUrl) {
+  bot = bot.addErrorWebhook(Env.webhookUrl)
+}
+
+await bot.login(Env.botToken)

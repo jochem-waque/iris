@@ -4,6 +4,7 @@ services:
     environment:
       BOT_TOKEN: "${BOT_TOKEN}"
       DB_FILE_NAME: "data/bot.db"
+      WEBHOOK_URL: "${WEBHOOK_URL}"
     restart: unless-stopped
     volumes:
       - iris-data:/app/data
