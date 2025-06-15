@@ -76,7 +76,7 @@ export const JoinPingSettings = d
         .insert(memberConfigTable)
         .values({
           user_id: interaction.user.id,
-          guild_id: interaction.guild.id,
+          guild_id: interaction.guildId,
           disable_streaming_pings: oldMemberConfig?.disable_streaming_pings,
           streaming_ping_cooldown: oldMemberConfig?.streaming_ping_cooldown,
           disable_join_pings: disabled,

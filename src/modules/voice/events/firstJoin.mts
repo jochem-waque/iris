@@ -20,7 +20,11 @@ import {
 export const FirstJoin = d
   .event("voiceStateUpdate")
   .handler(async (oldState, newState) => {
-    if (!newState.channel || oldState.channelId === newState.channelId) {
+    if (
+      !newState.channelId ||
+      !newState.channel ||
+      oldState.channelId === newState.channelId
+    ) {
       return
     }
 
@@ -43,7 +47,7 @@ export const FirstJoin = d
     const { messageOptions } = voiceStatus({
       source: "join",
       force: true,
-      voiceId: newState.channel.id,
+      voiceId: newState.channelId,
       guild: newState.guild,
       mention: newState.id,
     })
@@ -59,7 +63,7 @@ export const FirstJoin = d
 
     let condition: SQL | undefined = eq(
       messageTable.voice_id,
-      newState.channel.id,
+      newState.channelId,
     )
 
     if (message) {
@@ -67,7 +71,7 @@ export const FirstJoin = d
         .values({
           channel_id: message.channelId,
           message_id: message.id,
-          voice_id: newState.channel.id,
+          voice_id: newState.channelId,
         })
         .run()
 

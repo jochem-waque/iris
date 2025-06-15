@@ -21,7 +21,12 @@ import {
 export const MemberStreams = d
   .event("voiceStateUpdate")
   .handler(async (oldState, newState) => {
-    if (oldState.streaming || !newState.streaming || !newState.channel) {
+    if (
+      oldState.streaming ||
+      !newState.streaming ||
+      !newState.channelId ||
+      !newState.channel
+    ) {
       return
     }
 
@@ -38,14 +43,14 @@ export const MemberStreams = d
 
     const options: VoiceStatusMessageOptions = {
       source: "streaming",
-      voiceId: newState.channel.id,
+      voiceId: newState.channelId,
       guild: newState.guild,
       mention: newState.id,
     }
 
     const last = Database.select()
       .from(messageTable)
-      .where(eq(messageTable.voice_id, newState.channel.id))
+      .where(eq(messageTable.voice_id, newState.channelId))
       .orderBy(desc(messageTable.message_id))
       .limit(1)
       .get()
@@ -71,7 +76,7 @@ export const MemberStreams = d
 
     let condition: SQL | undefined = eq(
       messageTable.voice_id,
-      newState.channel.id,
+      newState.channelId,
     )
 
     if (message) {
@@ -79,7 +84,7 @@ export const MemberStreams = d
         .values({
           channel_id: message.channelId,
           message_id: message.id,
-          voice_id: newState.channel.id,
+          voice_id: newState.channelId,
         })
         .run()
 

@@ -18,7 +18,11 @@ import {
 export const LastLeave = d
   .event("voiceStateUpdate")
   .handler(async (oldState, newState) => {
-    if (!oldState.channel || oldState.channelId === newState.channelId) {
+    if (
+      !oldState.channelId ||
+      !oldState.channel ||
+      oldState.channelId === newState.channelId
+    ) {
       return
     }
 
@@ -27,10 +31,10 @@ export const LastLeave = d
       return
     }
 
-    TopicUpdatedAt.delete(oldState.channel.id)
+    TopicUpdatedAt.delete(oldState.channelId)
 
     const old = Database.delete(messageTable)
-      .where(eq(messageTable.voice_id, oldState.channel.id))
+      .where(eq(messageTable.voice_id, oldState.channelId))
       .returning()
       .all()
 
