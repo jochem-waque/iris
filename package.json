@@ -27,9 +27,9 @@
   "dependencies": {
     "better-sqlite3": "12.2.0",
     "camelcase-keys": "^9.1.3",
-    "discord.js": "^14.21.0",
+    "discord.js": "^14.22.0",
     "drizzle-orm": "^0.44.4",
-    "fluent-commands": "2.0.0-pre.2025-08-16.sha-05b5fee3",
+    "fluent-commands": "2.0.0-pre.2025-08-21.sha-eab3b62c",
     "zod": "^4.0.17"
   },
   "optionalDependencies": {
@@ -49,7 +49,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.2.0",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.39.1"
+    "typescript-eslint": "^8.40.0"
   },
   "prettier": {
     "semi": false,
