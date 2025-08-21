@@ -4,6 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { mentionTable } from "../../../schema.mjs"
@@ -27,6 +28,15 @@ export const ReactOnMention = d
     }
 
     for (const emoji of Emojis) {
-      await message.react(emoji)
+      try {
+        await message.react(emoji)
+      } catch (e) {
+        if (
+          !(e instanceof DiscordAPIError) ||
+          e.code !== RESTJSONErrorCodes.ReactionWasBlocked
+        ) {
+          throw e
+        }
+      }
     }
   })
