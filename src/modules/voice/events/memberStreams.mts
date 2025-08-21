@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ChannelType } from "discord.js"
+import { ChannelType, PermissionFlagsBits } from "discord.js"
 import { and, desc, eq, not, SQL } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -33,6 +33,14 @@ export const MemberStreams = d
     if (
       newState.channelId === newState.channel.guild.afkChannelId ||
       newState.channel.type === ChannelType.GuildStageVoice
+    ) {
+      return
+    }
+
+    if (
+      !newState.channel
+        .permissionsFor(newState.client.user.id)
+        ?.has(PermissionFlagsBits.ViewChannel)
     ) {
       return
     }

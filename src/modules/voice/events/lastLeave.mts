@@ -4,6 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { PermissionFlagsBits } from "discord.js"
 import { eq } from "drizzle-orm"
 import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
@@ -22,6 +23,14 @@ export const LastLeave = d
       !oldState.channelId ||
       !oldState.channel ||
       oldState.channelId === newState.channelId
+    ) {
+      return
+    }
+
+    if (
+      !oldState.channel
+        .permissionsFor(oldState.client.user.id)
+        ?.has(PermissionFlagsBits.ViewChannel)
     ) {
       return
     }
