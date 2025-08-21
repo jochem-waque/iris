@@ -4,6 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ActivityType } from "discord.js"
 import d from "fluent-commands"
 
 export const Startup = d
@@ -11,6 +12,11 @@ export const Startup = d
   .once()
   .handler((client) => {
     console.log("Running as", client.user.displayName)
+
+    client.user.setActivity({
+      name: "Now works for visible VCs only; update permissions accordingly!",
+      type: ActivityType.Custom,
+    })
 
     // FIXME: move into fluent-commands?
     function exitListener() {
