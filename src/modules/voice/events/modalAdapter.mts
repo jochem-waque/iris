@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import d from "fluent-commands"
+import d from "disfluent"
 import { Modals } from "../legacy/modal.mjs"
 
 export const ModalAdapter = d

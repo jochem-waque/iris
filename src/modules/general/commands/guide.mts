@@ -12,7 +12,7 @@ import {
   MessageFlags,
   unorderedList,
 } from "discord.js"
-import d from "fluent-commands"
+import d from "disfluent"
 
 export const Guide = d
   .slashCommand(

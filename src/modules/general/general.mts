@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import d from "fluent-commands"
+import d from "disfluent"
 import { Guide } from "./commands/guide.mjs"
 import { Info } from "./commands/info.mjs"
 import { Startup } from "./events/startup.mjs"

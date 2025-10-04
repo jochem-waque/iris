@@ -29,8 +29,8 @@ import {
   VoiceBasedChannel,
   VoiceState,
 } from "discord.js"
+import d from "disfluent"
 import { and, desc, eq } from "drizzle-orm"
-import d from "fluent-commands"
 import { Blacklist } from "../../blacklist.mjs"
 import { Database } from "../../index.mjs"
 import {

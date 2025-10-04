@@ -5,7 +5,7 @@
  */
 
 import { ActivityType } from "discord.js"
-import d from "fluent-commands"
+import d from "disfluent"
 
 export const Startup = d
   .event("ready")
@@ -18,7 +18,7 @@ export const Startup = d
       type: ActivityType.Custom,
     })
 
-    // FIXME: move into fluent-commands?
+    // FIXME: move into disfluent?
     function exitListener() {
       client
         .destroy()

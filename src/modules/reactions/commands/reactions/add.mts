@@ -11,7 +11,7 @@ import {
   MessageFlags,
   RESTJSONErrorCodes,
 } from "discord.js"
-import d from "fluent-commands"
+import d from "disfluent"
 import { Emojis } from "../../events/reactOnMention.mjs"
 
 export const Add = d

@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// TODO: refactor for fluent-commands
+// TODO: refactor for disfluent
 
 import {
   ActionRowBuilder,

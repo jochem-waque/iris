@@ -10,7 +10,7 @@ import {
   InteractionContextType,
   MessageFlags,
 } from "discord.js"
-import d from "fluent-commands"
+import d from "disfluent"
 import { removeActivityDropdown } from "../components/removeActivityDropdown.mjs"
 
 export const Activities = d

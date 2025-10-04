@@ -1,4 +1,4 @@
-import d from "fluent-commands"
+import d from "disfluent"
 
 export const Cooldowns = {
   "At most once every 30 minutes": d.select().stringOption("30").emoji("⏱️"),

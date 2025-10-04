@@ -11,7 +11,7 @@ import {
   InteractionContextType,
   MessageFlags,
 } from "discord.js"
-import d from "fluent-commands"
+import d from "disfluent"
 
 export const Remove = d
   .contextMenuCommand("Remove reactions")

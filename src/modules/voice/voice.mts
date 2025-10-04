@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import d from "fluent-commands"
+import d from "disfluent"
 import { Activities } from "./commands/activities.mjs"
 import { Link } from "./commands/link.mjs"
 import { Pings } from "./commands/pings.mjs"

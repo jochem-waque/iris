@@ -5,8 +5,8 @@
  */
 
 import { ChannelType, PermissionFlagsBits } from "discord.js"
+import d from "disfluent"
 import { and, eq, not, SQL } from "drizzle-orm"
-import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
 import {

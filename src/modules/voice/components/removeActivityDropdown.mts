@@ -5,8 +5,8 @@
  */
 
 import { Guild, heading, MessageFlags, unorderedList } from "discord.js"
+import d from "disfluent"
 import { desc, eq, inArray } from "drizzle-orm"
-import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { activitiesTable } from "../../../schema.mjs"
 

@@ -5,7 +5,7 @@
  */
 
 import { ApplicationIntegrationType, InteractionContextType } from "discord.js"
-import d from "fluent-commands"
+import d from "disfluent"
 import { Add } from "./reactions/add.mjs"
 import { Toggle } from "./reactions/toggle.mjs"
 

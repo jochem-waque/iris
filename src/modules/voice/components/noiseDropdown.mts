@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import d from "fluent-commands"
+import d from "disfluent"
 import { conditionallyUpdateStatus, voiceStatus } from "../util.mjs"
 
 export const NoiseDropdown = d

@@ -5,8 +5,8 @@
  */
 
 import { PermissionFlagsBits } from "discord.js"
+import d from "disfluent"
 import { eq } from "drizzle-orm"
-import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
 import {

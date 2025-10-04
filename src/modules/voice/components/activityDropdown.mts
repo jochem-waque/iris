@@ -4,8 +4,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import d from "disfluent"
 import { eq } from "drizzle-orm"
-import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { activitiesTable } from "../../../schema.mjs"
 import { AddActivity } from "../legacy/addActivity.mjs"

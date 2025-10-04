@@ -1,5 +1,5 @@
+import d from "disfluent"
 import { desc, eq } from "drizzle-orm"
-import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { guildConfigTable } from "../../../schema.mjs"
 import { serverSettingsMessage } from "../commands/server.mjs"

@@ -11,8 +11,8 @@ import {
   MessageFlags,
   unorderedList,
 } from "discord.js"
+import d from "disfluent"
 import { and, desc, eq } from "drizzle-orm"
-import d from "fluent-commands"
 import { Database } from "../../../index.mjs"
 import { guildConfigTable, memberConfigTable } from "../../../schema.mjs"
 import { joinPingSettings } from "../components/joinPingSettings.mjs"

@@ -5,7 +5,7 @@
  */
 
 import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js"
-import d from "fluent-commands"
+import d from "disfluent"
 import { Database } from "../../../index.mjs"
 import { mentionTable } from "../../../schema.mjs"
 

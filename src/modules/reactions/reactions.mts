@@ -4,7 +4,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import d from "fluent-commands"
+import d from "disfluent"
 import { Add } from "./commands/add.mjs"
 import { Reactions as ReactionsCommand } from "./commands/reactions.mjs"
 import { Remove } from "./commands/remove.mjs"

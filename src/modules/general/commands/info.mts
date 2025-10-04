@@ -12,7 +12,7 @@ import {
   MessageFlags,
   unorderedList,
 } from "discord.js"
-import d from "fluent-commands"
+import d from "disfluent"
 import { Reactions } from "../../reactions/commands/reactions.mjs"
 import { Pings } from "../../voice/commands/pings.mjs"
 import { Server } from "../../voice/commands/server.mjs"
