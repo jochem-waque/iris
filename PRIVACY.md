@@ -25,10 +25,12 @@ The following data is stored by the service:
   - User IDs.
   - Text channel IDs.
   - Voice channel IDs.
+ 
+No other data is stored.
 
 ## Data Location
 
-Data is processed and stored with the European Union.
+Data is processed and stored within the European Union.
 
 ## Contact
 
