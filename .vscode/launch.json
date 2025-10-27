@@ -13,7 +13,7 @@
       "program": "${workspaceFolder}\\dist\\index.mjs",
       "outFiles": ["${workspaceFolder}/**/*.mjs"],
       "envFile": "${workspaceFolder}/.env",
-      "runtimeVersion": "24"
+      "runtimeVersion": "25"
     }
   ]
 }
