@@ -37,10 +37,6 @@ export const AddActivity = modal({
       .returning()
       .get()
 
-    if (!newActivity) {
-      return
-    }
-
     const { messageOptions, status, channelId } = voiceStatus({
       force: true,
       activity: newActivity.id.toString(),

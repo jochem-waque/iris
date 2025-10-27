@@ -44,22 +44,21 @@ export function modalInput<T extends boolean, TT extends string>(
 }
 
 export function modal<
-  T extends string,
-  TT extends readonly ReturnType<typeof modalInput>[],
-  TTT extends readonly string[],
+  Inputs extends readonly ReturnType<typeof modalInput>[],
+  Args extends readonly string[],
 >({
   id,
   title,
   components,
   handle,
 }: {
-  id: T
+  id: string
   title: string
-  components: readonly [...TT]
+  components: readonly [...Inputs]
   handle: (
     interaction: ModalSubmitInteraction,
-    values: InferModalValues<TT>,
-    ...args: [...TTT]
+    values: InferModalValues<Inputs>,
+    ...args: [...Args]
   ) => Promise<void>
 }) {
   if (Modals.has(id)) {
@@ -82,14 +81,14 @@ export function modal<
 
     await handle(
       interaction,
-      values as InferModalValues<TT>,
-      ...(interaction.customId.split(":").slice(1) as [...TTT]),
+      values as InferModalValues<Inputs>,
+      ...(interaction.customId.split(":").slice(1) as [...Args]),
     )
   })
 
   function setupForm(
-    defaults?: Partial<InferModalValues<TT>>,
-    ...args: [...TTT]
+    defaults?: Partial<InferModalValues<Inputs>>,
+    ...args: [...Args]
   ) {
     return new ModalBuilder()
       .setTitle(title)
@@ -98,7 +97,10 @@ export function modal<
         components.map((c) => {
           const input = new TextInputBuilder(c.builder.data)
           if (defaults && c.id in defaults) {
-            input.setValue((defaults as Record<string, string>)[c.id] as string)
+            const value = (defaults as Record<string, string>)[c.id]
+            if (value) {
+              input.setValue(value)
+            }
           }
 
           return new ActionRowBuilder<ModalActionRowComponentBuilder>().setComponents(

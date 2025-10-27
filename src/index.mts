@@ -58,7 +58,7 @@ let bot = d
 
     if (
       "handlerParameters" in context &&
-      context.handlerParameters?.[0] instanceof BaseInteraction
+      context.handlerParameters[0] instanceof BaseInteraction
     ) {
       interaction = context.handlerParameters[0]
     }
@@ -67,7 +67,7 @@ let bot = d
       return
     }
 
-    if (!interaction?.isRepliable()) {
+    if (!interaction.isRepliable()) {
       return
     }
 

@@ -47,7 +47,7 @@ export const RemoveActivityDropdown = d
             d.row(dropdown),
             d.text(
               heading(
-                `Removed ${deleted.length} ${deleted.length === 1 ? "entry" : "entries"}`,
+                `Removed ${deleted.length.toString()} ${deleted.length === 1 ? "entry" : "entries"}`,
               ),
             ),
             d.text(unorderedList(deleted.map((entry) => entry.label))),

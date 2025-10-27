@@ -95,7 +95,7 @@ function addCooldown(
     .run()
 }
 
-export type VoiceStatusMessageOptions = {
+export interface VoiceStatusMessageOptions {
   guild: Guild
   source?: "streaming" | "join"
   voiceId?: Snowflake
@@ -105,7 +105,7 @@ export type VoiceStatusMessageOptions = {
   mention?: Snowflake
 }
 
-type VoiceStatus = {
+interface VoiceStatus {
   messageOptions: InteractionUpdateOptions & MessageCreateOptions
   status: string | null
   channelId: string | undefined
@@ -259,7 +259,7 @@ export function voiceStatus({
     messageOptions,
     status:
       currentActivity || currentNoise
-        ? `${formatOption(currentActivity)} | ${formatOption(currentNoise)?.toLowerCase()}`
+        ? `${formatOption(currentActivity) ?? ""} | ${formatOption(currentNoise)?.toLowerCase() ?? ""}`
         : null,
     channelId: voiceId,
   }
@@ -434,11 +434,7 @@ export function serverJoinPingSettings(
   }
 
   return [
-    d.row(
-      ServerJoinPingOptOut.with([
-        guild.allowOptOut === true ? "true" : "false",
-      ]),
-    ),
+    d.row(ServerJoinPingOptOut.with([guild.allowOptOut ? "true" : "false"])),
     d.row(
       ServerDefaultJoinPingCooldown.with([
         guild.defaultCooldown.toString() as "0",
@@ -462,9 +458,7 @@ export function serverStreamingPingSettings(
 
   return [
     d.row(
-      ServerStreamingPingOptOut.with([
-        guild.allowOptOut === true ? "true" : "false",
-      ]),
+      ServerStreamingPingOptOut.with([guild.allowOptOut ? "true" : "false"]),
     ),
     d.row(
       ServerDefaultStreamingPingCooldown.with([
@@ -484,7 +478,7 @@ function formatOption(option?: StringSelectMenuOptionBuilder) {
     return option.data.label
   }
 
-  return `${option.data.emoji.name} ${option.data.label}`
+  return `${option.data.emoji.name} ${option.data.label ?? ""}`
 }
 
 function selectedValue(component?: MessageActionRowComponent | null) {

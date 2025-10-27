@@ -24,13 +24,12 @@ export const Toggle = d
         return false
       }
 
-      const inserted = tx
-        .insert(mentionTable)
+      tx.insert(mentionTable)
         .values({ userId: interaction.user.id })
         .returning()
-        .get()
+        .run()
 
-      return inserted !== undefined
+      return true
     })
 
     if (stored) {

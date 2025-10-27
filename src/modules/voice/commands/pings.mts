@@ -105,7 +105,7 @@ function pingsTexts(
       )
     } else {
       strings.push(
-        `This server allows you to set a ${type} ping cooldown up to ${guild.maxCooldown} ${guild.maxCooldown === 1 ? "minute" : "minutes"}.`,
+        `This server allows you to set a ${type} ping cooldown up to ${guild.maxCooldown.toString()} ${guild.maxCooldown === 1 ? "minute" : "minutes"}.`,
       )
     }
   }
