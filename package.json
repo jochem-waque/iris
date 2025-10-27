@@ -11,9 +11,9 @@
   "main": "src/index.mts",
   "engineStrict": true,
   "engines": {
-    "node": ">=24"
+    "node": ">=25"
   },
-  "packageManager": "pnpm@10.18.0+sha512.e804f889f1cecc40d572db084eec3e4881739f8dec69c0ff10d2d1beff9a4e309383ba27b5b750059d7f4c149535b6cd0d2cb1ed3aeb739239a4284a68f40cfa",
+  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8",
   "devEngines": {
     "runtime": {
       "name": "node",
@@ -27,29 +27,29 @@
   "dependencies": {
     "better-sqlite3": "12.4.1",
     "camelcase-keys": "^10.0.0",
-    "discord.js": "^14.22.1",
+    "discord.js": "^14.24.0",
     "disfluent": "^2.0.0",
-    "drizzle-orm": "^0.44.6",
-    "zod": "^4.1.11"
+    "drizzle-orm": "^0.44.7",
+    "zod": "^4.1.12"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.9",
     "zlib-sync": "^0.1.10"
   },
   "devDependencies": {
-    "@eslint/js": "^9.37.0",
+    "@eslint/js": "^9.38.0",
     "@tsconfig/node24": "^24.0.1",
     "@tsconfig/strictest": "^2.0.6",
     "@types/better-sqlite3": "^7.6.13",
     "@types/eslint-config-prettier": "^6.11.3",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.9.1",
     "drizzle-kit": "^0.31.5",
-    "eslint": "^9.37.0",
+    "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.45.0"
+    "typescript-eslint": "^8.46.2"
   },
   "prettier": {
     "semi": false,

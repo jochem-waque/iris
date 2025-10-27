@@ -8,6 +8,7 @@
 
 import {
   ActionRowBuilder,
+  ComponentType,
   type ModalActionRowComponentBuilder,
   ModalBuilder,
   ModalSubmitInteraction,
@@ -67,7 +68,9 @@ export function modal<
 
   Modals.set(id, async (interaction) => {
     const values: Record<string, string> = {}
-    for (const row of interaction.components) {
+    for (const row of interaction.components.filter(
+      (row) => row.type === ComponentType.ActionRow,
+    )) {
       for (const input of row.components) {
         if (input.value === "") {
           continue

@@ -1,4 +1,4 @@
-FROM node:24-alpine AS builder
+FROM node:25-alpine AS builder
 ENV NODE_ENV=development
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY . .
 RUN pnpm tsc && \
     pnpm prune --prod
 
-FROM node:24-alpine
+FROM node:25-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 
