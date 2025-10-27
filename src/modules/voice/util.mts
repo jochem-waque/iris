@@ -30,15 +30,17 @@ import {
   VoiceState,
 } from "discord.js"
 import d from "disfluent"
-import { and, desc, eq } from "drizzle-orm"
+import { and, desc, eq, gt, sql } from "drizzle-orm"
 import { Blacklist } from "../../blacklist.mjs"
 import { Database } from "../../index.mjs"
 import {
   activitiesTable,
   guildConfigTable,
+  joinCooldownTable,
   linkTable,
   memberConfigTable,
   messageTable,
+  streamCooldownTable,
 } from "../../schema.mjs"
 import { joinPings, streamingPings } from "./commands/pings.mjs"
 import { ActivityDropdown } from "./components/activityDropdown.mjs"
@@ -50,10 +52,48 @@ import { ServerMaxJoinPingCooldown } from "./components/serverMaxJoinPingCooldow
 import { ServerMaxStreamingPingCooldown } from "./components/serverMaxStreamingPingCooldown.mjs"
 import { ServerStreamingPingOptOut } from "./components/serverStreamingPingOptOut.mjs"
 
-export const TopicUpdatedAt = new Map<string, number>()
+function hasCooldown(
+  source: "join" | "streaming",
+  channelId: string,
+  userId: string,
+) {
+  const table = source === "join" ? joinCooldownTable : streamCooldownTable
 
-const JoinCooldowns = new Set<string>()
-const StreamingCooldowns = new Set<string>()
+  const exists = Database.select({ dummy: sql`1` })
+    .from(table)
+    .where(
+      and(
+        gt(table.expiresAt, sql`UNIXEPOCH('subsecond') * 1000`),
+        eq(table.channelId, channelId),
+        eq(table.userId, userId),
+      ),
+    )
+    .limit(1)
+    .get()
+
+  return !!exists
+}
+
+function addCooldown(
+  source: "join" | "streaming",
+  channelId: string,
+  userId: string,
+  millis: number,
+) {
+  const table = source === "join" ? joinCooldownTable : streamCooldownTable
+
+  Database.insert(table)
+    .values({
+      channelId,
+      userId,
+      expiresAt: new Date(Date.now() + millis),
+    })
+    .onConflictDoUpdate({
+      target: [table.userId, table.channelId],
+      set: { expiresAt: new Date(Date.now() + millis) },
+    })
+    .run()
+}
 
 export type VoiceStatusMessageOptions = {
   guild: Guild
@@ -87,19 +127,12 @@ export function voiceStatus({
   mention,
   source,
 }: VoiceStatusMessageOptions & { force?: true }) {
-  const key = `${guild.id}-${mention}`
-
   if (mention && Blacklist.has(mention)) {
     mention = undefined
   }
 
-  if (mention && source) {
-    if (
-      (source === "join" && JoinCooldowns.has(key)) ||
-      (source === "streaming" && StreamingCooldowns.has(key))
-    ) {
-      mention = undefined
-    }
+  if (mention && source && voiceId && hasCooldown(source, voiceId, mention)) {
+    mention = undefined
   }
 
   if (!force && !mention) {
@@ -137,29 +170,8 @@ export function voiceStatus({
         ? joinPings(guildConfig, memberConfig)
         : streamingPings(guildConfig, memberConfig)
 
-    if (typeof member === "number") {
-      switch (source) {
-        case "join":
-          JoinCooldowns.add(key)
-          setTimeout(
-            () => {
-              JoinCooldowns.delete(key)
-            },
-            member * 60 * 1000,
-          )
-
-          break
-        case "streaming":
-          StreamingCooldowns.add(key)
-          setTimeout(
-            () => {
-              StreamingCooldowns.delete(key)
-            },
-            member * 60 * 1000,
-          )
-
-          break
-      }
+    if (typeof member === "number" && voiceId && source) {
+      addCooldown(source, voiceId, mention, member * 60 * 1000)
     }
   }
 
@@ -167,9 +179,13 @@ export function voiceStatus({
     2,
     -1,
   )
-
+  let lastUpdatedAtText = text(
+    findComponentById(oldMessage?.components ?? [], 2),
+  )
   if (voiceId && (activity || noise)) {
-    TopicUpdatedAt.set(voiceId, Date.now())
+    lastUpdatedAtText = subtext(
+      `Last updated ${time(new Date(), TimestampStyles.RelativeTime)}`,
+    )
   }
 
   activity ??= selectedValue(oldMessage?.resolveComponent(ActivityDropdown.id))
@@ -214,15 +230,8 @@ export function voiceStatus({
   }
 
   const footer = []
-  const lastUpdatedAt = TopicUpdatedAt.get(voiceId ?? "")
-  if (lastUpdatedAt) {
-    footer.push(
-      d.text(
-        subtext(
-          `Last updated ${time(new Date(lastUpdatedAt), TimestampStyles.RelativeTime)}`,
-        ),
-      ),
-    )
+  if (lastUpdatedAtText) {
+    footer.push(d.text(lastUpdatedAtText).id(2))
   }
 
   const messageOptions: MessageCreateOptions = {

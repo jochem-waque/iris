@@ -29,6 +29,13 @@
       "when": 1748027823693,
       "tag": "0003_oval_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1761601115878,
+      "tag": "0004_daily_glorian",
+      "breakpoints": true
     }
   ]
 }

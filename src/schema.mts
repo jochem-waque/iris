@@ -80,3 +80,25 @@ export const memberConfigTable = sqliteTable("member_config", {
   disableStreamingPings: int("disable_streaming_pings", { mode: "boolean" }),
   streamingPingCooldown: int("streaming_ping_cooldown"),
 })
+
+export const joinCooldownTable = sqliteTable(
+  "join_cooldown",
+  {
+    id: int().primaryKey(),
+    userId: text("user_id").notNull(),
+    channelId: text("channel_id").notNull(),
+    expiresAt: int("expiresAt", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [unique().on(table.channelId, table.userId)],
+)
+
+export const streamCooldownTable = sqliteTable(
+  "stream_cooldown",
+  {
+    id: int().primaryKey(),
+    userId: text("user_id").notNull(),
+    channelId: text("channel_id").notNull(),
+    expiresAt: int("expiresAt", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [unique().on(table.channelId, table.userId)],
+)
