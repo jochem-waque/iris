@@ -27,7 +27,7 @@ export const StreamingPingSettings = d
       const guildConfig = tx
         .select()
         .from(guildConfigTable)
-        .where(eq(guildConfigTable.guild_id, interaction.guildId))
+        .where(eq(guildConfigTable.guildId, interaction.guildId))
         .orderBy(desc(guildConfigTable.timestamp))
         .limit(1)
         .get()
@@ -39,8 +39,8 @@ export const StreamingPingSettings = d
         .from(memberConfigTable)
         .where(
           and(
-            eq(memberConfigTable.guild_id, interaction.guildId),
-            eq(memberConfigTable.user_id, interaction.user.id),
+            eq(memberConfigTable.guildId, interaction.guildId),
+            eq(memberConfigTable.userId, interaction.user.id),
           ),
         )
         .orderBy(desc(memberConfigTable.timestamp))
@@ -74,12 +74,12 @@ export const StreamingPingSettings = d
       const memberConfig = tx
         .insert(memberConfigTable)
         .values({
-          user_id: interaction.user.id,
-          guild_id: interaction.guildId,
-          disable_join_pings: oldMemberConfig?.disable_join_pings,
-          join_ping_cooldown: oldMemberConfig?.join_ping_cooldown,
-          disable_streaming_pings: disabled,
-          streaming_ping_cooldown: cooldown,
+          userId: interaction.user.id,
+          guildId: interaction.guildId,
+          disableJoinPings: oldMemberConfig?.disableJoinPings,
+          joinPingCooldown: oldMemberConfig?.joinPingCooldown,
+          disableStreamingPings: disabled,
+          streamingPingCooldown: cooldown,
         })
         .returning()
         .get()

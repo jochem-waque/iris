@@ -13,60 +13,70 @@ export const activitiesTable = sqliteTable(
   {
     id: int().primaryKey(),
     label: text().notNull(),
-    last_used: int({ mode: "timestamp_ms" }).default(
+    lastUsed: int("last_used", { mode: "timestamp_ms" }).default(
       sql`(UNIXEPOCH('subsecond') * 1000)`,
     ),
-    guild_id: text().notNull(),
+    guildId: text("guild_id").notNull(),
   },
-  (table) => [unique().on(table.label, table.guild_id)],
+  (table) => [unique().on(table.label, table.guildId)],
 )
 
 // Add reactions to users in the mention table
 export const mentionTable = sqliteTable("mention", {
   id: int().primaryKey(),
-  user_id: text().notNull().unique(),
+  userId: text("user_id").notNull().unique(),
 })
 
 // All current voice status messages
 export const messageTable = sqliteTable("message", {
   id: int().primaryKey(),
-  channel_id: text().notNull(),
-  message_id: text().notNull().unique(),
-  voice_id: text().notNull(),
+  channelId: text("channel_id").notNull(),
+  messageId: text("message_id").notNull().unique(),
+  voiceId: text("voice_id").notNull(),
 })
 
 // Links between text and voice channels
 export const linkTable = sqliteTable("link", {
   id: int().primaryKey(),
-  text_id: text().notNull(),
-  voice_id: text().notNull().unique(),
+  textId: text("text_id").notNull(),
+  voiceId: text("voice_id").notNull().unique(),
 })
 
 // Server configuration
 export const guildConfigTable = sqliteTable("config", {
   id: int().primaryKey(),
-  guild_id: text().notNull(),
+  guildId: text("guild_id").notNull(),
   timestamp: int({ mode: "timestamp_ms" })
     .notNull()
     .default(sql`(UNIXEPOCH('subsecond') * 1000)`),
-  allow_join_opt_out: int({ mode: "boolean" }).notNull().default(true),
-  max_join_ping_cooldown: int().notNull().default(0),
-  default_join_ping_cooldown: int().notNull().default(0),
-  allow_streaming_opt_out: int({ mode: "boolean" }).notNull().default(false),
-  max_streaming_ping_cooldown: int().notNull().default(0),
-  default_streaming_ping_cooldown: int().notNull().default(0),
+  allowJoinOptOut: int("allow_join_opt_out", { mode: "boolean" })
+    .notNull()
+    .default(true),
+  maxJoinPingCooldown: int("max_join_ping_cooldown").notNull().default(0),
+  defaultJoinPingCooldown: int("default_join_ping_cooldown")
+    .notNull()
+    .default(0),
+  allowStreamingOptOut: int("allow_streaming_opt_out", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  maxStreamingPingCooldown: int("max_streaming_ping_cooldown")
+    .notNull()
+    .default(0),
+  defaultStreamingPingCooldown: int("default_streaming_ping_cooldown")
+    .notNull()
+    .default(0),
 })
 
 // Member configuration
 export const memberConfigTable = sqliteTable("member_config", {
   id: int().primaryKey(),
-  user_id: text().notNull(),
-  guild_id: text().notNull(),
+  userId: text("user_id").notNull(),
+  guildId: text("guild_id").notNull(),
   timestamp: int({ mode: "timestamp_ms" })
     .notNull()
     .default(sql`(UNIXEPOCH('subsecond') * 1000)`),
-  disable_join_pings: int({ mode: "boolean" }),
-  join_ping_cooldown: int(),
-  disable_streaming_pings: int({ mode: "boolean" }),
-  streaming_ping_cooldown: int(),
+  disableJoinPings: int("disable_join_pings", { mode: "boolean" }),
+  joinPingCooldown: int("join_ping_cooldown"),
+  disableStreamingPings: int("disable_streaming_pings", { mode: "boolean" }),
+  streamingPingCooldown: int("streaming_ping_cooldown"),
 })

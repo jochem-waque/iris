@@ -35,7 +35,7 @@ export const Server = d
 
         const guildConfig = Database.select()
           .from(guildConfigTable)
-          .where(eq(guildConfigTable.guild_id, interaction.guildId))
+          .where(eq(guildConfigTable.guildId, interaction.guildId))
           .orderBy(desc(guildConfigTable.timestamp))
           .limit(1)
           .get()

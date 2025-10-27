@@ -43,7 +43,7 @@ export const LastLeave = d
     TopicUpdatedAt.delete(oldState.channelId)
 
     const old = Database.delete(messageTable)
-      .where(eq(messageTable.voice_id, oldState.channelId))
+      .where(eq(messageTable.voiceId, oldState.channelId))
       .returning()
       .all()
 

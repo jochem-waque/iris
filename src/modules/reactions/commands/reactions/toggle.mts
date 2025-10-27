@@ -16,7 +16,7 @@ export const Toggle = d
     const stored = Database.transaction((tx) => {
       const existing = tx
         .delete(mentionTable)
-        .where(eq(mentionTable.user_id, interaction.user.id))
+        .where(eq(mentionTable.userId, interaction.user.id))
         .returning()
         .get()
 
@@ -26,7 +26,7 @@ export const Toggle = d
 
       const inserted = tx
         .insert(mentionTable)
-        .values({ user_id: interaction.user.id })
+        .values({ userId: interaction.user.id })
         .returning()
         .get()
 

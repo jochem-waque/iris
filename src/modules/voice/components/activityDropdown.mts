@@ -32,7 +32,7 @@ export const ActivityDropdown = d
     }
 
     Database.update(activitiesTable)
-      .set({ last_used: new Date() })
+      .set({ lastUsed: new Date() })
       .where(eq(activitiesTable.id, parseInt(interaction.values[0])))
       .run()
 

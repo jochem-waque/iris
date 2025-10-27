@@ -111,7 +111,7 @@ export function voiceStatus({
       const guildConfig = tx
         .select()
         .from(guildConfigTable)
-        .where(eq(guildConfigTable.guild_id, guild.id))
+        .where(eq(guildConfigTable.guildId, guild.id))
         .orderBy(desc(guildConfigTable.timestamp))
         .limit(1)
         .get()
@@ -121,8 +121,8 @@ export function voiceStatus({
         .from(memberConfigTable)
         .where(
           and(
-            eq(memberConfigTable.guild_id, guild.id),
-            eq(memberConfigTable.user_id, mention),
+            eq(memberConfigTable.guildId, guild.id),
+            eq(memberConfigTable.userId, mention),
           ),
         )
         .orderBy(desc(memberConfigTable.timestamp))
@@ -177,8 +177,8 @@ export function voiceStatus({
 
   const activities = Database.select()
     .from(activitiesTable)
-    .where(eq(activitiesTable.guild_id, guild.id))
-    .orderBy(desc(activitiesTable.last_used))
+    .where(eq(activitiesTable.guildId, guild.id))
+    .orderBy(desc(activitiesTable.lastUsed))
     .limit(24)
     .all()
 
@@ -297,7 +297,7 @@ export async function voiceStateIsBot(state: VoiceState) {
 export async function getTextChannel(channel: VoiceBasedChannel) {
   const link = Database.select()
     .from(linkTable)
-    .where(eq(linkTable.voice_id, channel.id))
+    .where(eq(linkTable.voiceId, channel.id))
     .limit(1)
     .get()
 
@@ -307,7 +307,7 @@ export async function getTextChannel(channel: VoiceBasedChannel) {
 
   let linkedChannel
   try {
-    linkedChannel = await channel.guild.channels.fetch(link.text_id)
+    linkedChannel = await channel.guild.channels.fetch(link.textId)
   } catch (e) {
     if (
       !(e instanceof DiscordAPIError) ||
@@ -329,7 +329,7 @@ export async function deleteOldMessages(
   for (const message of old) {
     let channel
     try {
-      channel = await guild.channels.fetch(message.channel_id)
+      channel = await guild.channels.fetch(message.channelId)
     } catch (e) {
       console.error(e)
       continue
@@ -340,7 +340,7 @@ export async function deleteOldMessages(
     }
 
     try {
-      await channel.messages.delete(message.message_id)
+      await channel.messages.delete(message.messageId)
     } catch (e) {
       console.error(e)
       continue
@@ -358,7 +358,7 @@ export async function fetchOldMessage(
 
   let channel
   try {
-    channel = await guild.channels.fetch(old.channel_id)
+    channel = await guild.channels.fetch(old.channelId)
   } catch (e) {
     if (
       !(e instanceof DiscordAPIError) ||
@@ -376,7 +376,7 @@ export async function fetchOldMessage(
 
   let message
   try {
-    message = await channel.messages.fetch(old.message_id)
+    message = await channel.messages.fetch(old.messageId)
   } catch (e) {
     if (
       e instanceof DiscordAPIError &&

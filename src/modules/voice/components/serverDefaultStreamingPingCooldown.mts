@@ -33,7 +33,7 @@ export const ServerDefaultStreamingPingCooldown = d
       const old = tx
         .select()
         .from(guildConfigTable)
-        .where(eq(guildConfigTable.guild_id, interaction.guildId))
+        .where(eq(guildConfigTable.guildId, interaction.guildId))
         .orderBy(desc(guildConfigTable.timestamp))
         .limit(1)
         .get()
@@ -41,16 +41,16 @@ export const ServerDefaultStreamingPingCooldown = d
       return tx
         .insert(guildConfigTable)
         .values({
-          guild_id: interaction.guildId,
-          allow_join_opt_out: old?.allow_join_opt_out,
-          max_join_ping_cooldown: old?.max_join_ping_cooldown,
-          default_join_ping_cooldown: old?.default_join_ping_cooldown,
-          allow_streaming_opt_out: old?.allow_streaming_opt_out,
-          default_streaming_ping_cooldown: number,
-          max_streaming_ping_cooldown: Math.max(
+          guildId: interaction.guildId,
+          allowJoinOptOut: old?.allowJoinOptOut,
+          maxJoinPingCooldown: old?.maxJoinPingCooldown,
+          defaultJoinPingCooldown: old?.defaultJoinPingCooldown,
+          allowStreamingOptOut: old?.allowStreamingOptOut,
+          defaultStreamingPingCooldown: number,
+          maxStreamingPingCooldown: Math.max(
             number,
-            old?.max_streaming_ping_cooldown ??
-              Number(guildConfigTable.max_streaming_ping_cooldown.default),
+            old?.maxStreamingPingCooldown ??
+              Number(guildConfigTable.maxStreamingPingCooldown.default),
           ),
         })
         .returning()

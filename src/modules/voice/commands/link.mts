@@ -37,7 +37,7 @@ export const Link = d
   .defaultMemberPermissions(PermissionFlagsBits.ManageChannels)
   .handler(async (interaction, { voice, text }) => {
     if (!text) {
-      Database.delete(linkTable).where(eq(linkTable.voice_id, voice.id)).run()
+      Database.delete(linkTable).where(eq(linkTable.voiceId, voice.id)).run()
 
       await interaction.reply({
         flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
@@ -59,12 +59,12 @@ export const Link = d
 
     Database.insert(linkTable)
       .values({
-        text_id: text.id,
-        voice_id: voice.id,
+        textId: text.id,
+        voiceId: voice.id,
       })
       .onConflictDoUpdate({
-        target: linkTable.voice_id,
-        set: { text_id: text.id },
+        target: linkTable.voiceId,
+        set: { textId: text.id },
       })
       .run()
 

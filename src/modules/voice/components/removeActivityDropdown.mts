@@ -60,8 +60,8 @@ export const RemoveActivityDropdown = d
 export function removeActivityDropdown(guild: Guild) {
   const activities = Database.select()
     .from(activitiesTable)
-    .where(eq(activitiesTable.guild_id, guild.id))
-    .orderBy(desc(activitiesTable.last_used))
+    .where(eq(activitiesTable.guildId, guild.id))
+    .orderBy(desc(activitiesTable.lastUsed))
     .limit(25)
     .all()
 

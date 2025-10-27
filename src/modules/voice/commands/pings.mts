@@ -34,7 +34,7 @@ export const Pings = d
           const guildConfig = tx
             .select()
             .from(guildConfigTable)
-            .where(eq(guildConfigTable.guild_id, interaction.guildId))
+            .where(eq(guildConfigTable.guildId, interaction.guildId))
             .orderBy(desc(guildConfigTable.timestamp))
             .limit(1)
             .get()
@@ -44,8 +44,8 @@ export const Pings = d
             .from(memberConfigTable)
             .where(
               and(
-                eq(memberConfigTable.guild_id, interaction.guildId),
-                eq(memberConfigTable.user_id, interaction.user.id),
+                eq(memberConfigTable.guildId, interaction.guildId),
+                eq(memberConfigTable.userId, interaction.user.id),
               ),
             )
             .orderBy(desc(memberConfigTable.timestamp))
@@ -116,25 +116,23 @@ function pingsTexts(
 export function joinPings(
   guildConfig?: Pick<
     typeof guildConfigTable.$inferSelect,
-    | "allow_join_opt_out"
-    | "max_join_ping_cooldown"
-    | "default_join_ping_cooldown"
+    "allowJoinOptOut" | "maxJoinPingCooldown" | "defaultJoinPingCooldown"
   >,
   memberConfig?: Pick<
     typeof memberConfigTable.$inferSelect,
-    "disable_join_pings" | "join_ping_cooldown"
+    "disableJoinPings" | "joinPingCooldown"
   >,
 ) {
   const guild = {
     allowOptOut:
-      guildConfig?.allow_join_opt_out ??
-      guildConfigTable.allow_join_opt_out.default === true,
+      guildConfig?.allowJoinOptOut ??
+      guildConfigTable.allowJoinOptOut.default === true,
     maxCooldown:
-      guildConfig?.max_join_ping_cooldown ??
-      Number(guildConfigTable.max_join_ping_cooldown.default),
+      guildConfig?.maxJoinPingCooldown ??
+      Number(guildConfigTable.maxJoinPingCooldown.default),
     defaultCooldown:
-      guildConfig?.default_join_ping_cooldown ??
-      Number(guildConfigTable.default_join_ping_cooldown.default),
+      guildConfig?.defaultJoinPingCooldown ??
+      Number(guildConfigTable.defaultJoinPingCooldown.default),
   }
 
   if (guild.allowOptOut) {
@@ -143,19 +141,19 @@ export function joinPings(
 
   guild.defaultCooldown = Math.min(guild.defaultCooldown, guild.maxCooldown)
 
-  if (memberConfig?.disable_join_pings === false) {
+  if (memberConfig?.disableJoinPings === false) {
     return { guild, member: true }
   }
 
-  if (memberConfig?.disable_join_pings && guild.allowOptOut) {
+  if (memberConfig?.disableJoinPings && guild.allowOptOut) {
     return { guild, member: false }
   }
 
-  if (memberConfig?.join_ping_cooldown) {
+  if (memberConfig?.joinPingCooldown) {
     return {
       guild,
       member:
-        Math.min(memberConfig.join_ping_cooldown, guild.maxCooldown) || true,
+        Math.min(memberConfig.joinPingCooldown, guild.maxCooldown) || true,
     }
   }
 
@@ -165,25 +163,25 @@ export function joinPings(
 export function streamingPings(
   guildConfig?: Pick<
     typeof guildConfigTable.$inferSelect,
-    | "allow_streaming_opt_out"
-    | "max_streaming_ping_cooldown"
-    | "default_streaming_ping_cooldown"
+    | "allowStreamingOptOut"
+    | "maxStreamingPingCooldown"
+    | "defaultStreamingPingCooldown"
   >,
   memberConfig?: Pick<
     typeof memberConfigTable.$inferSelect,
-    "disable_streaming_pings" | "streaming_ping_cooldown"
+    "disableStreamingPings" | "streamingPingCooldown"
   >,
 ) {
   const guild = {
     allowOptOut:
-      guildConfig?.allow_streaming_opt_out ??
-      guildConfigTable.allow_streaming_opt_out.default === true,
+      guildConfig?.allowStreamingOptOut ??
+      guildConfigTable.allowStreamingOptOut.default === true,
     maxCooldown:
-      guildConfig?.max_streaming_ping_cooldown ??
-      Number(guildConfigTable.max_streaming_ping_cooldown.default),
+      guildConfig?.maxStreamingPingCooldown ??
+      Number(guildConfigTable.maxStreamingPingCooldown.default),
     defaultCooldown:
-      guildConfig?.default_streaming_ping_cooldown ??
-      Number(guildConfigTable.default_streaming_ping_cooldown.default),
+      guildConfig?.defaultStreamingPingCooldown ??
+      Number(guildConfigTable.defaultStreamingPingCooldown.default),
   }
 
   if (guild.allowOptOut) {
@@ -192,20 +190,19 @@ export function streamingPings(
 
   guild.defaultCooldown = Math.min(guild.defaultCooldown, guild.maxCooldown)
 
-  if (memberConfig?.disable_streaming_pings === false) {
+  if (memberConfig?.disableStreamingPings === false) {
     return { guild, member: true }
   }
 
-  if (memberConfig?.disable_streaming_pings && guild.allowOptOut) {
+  if (memberConfig?.disableStreamingPings && guild.allowOptOut) {
     return { guild, member: false }
   }
 
-  if (memberConfig?.streaming_ping_cooldown) {
+  if (memberConfig?.streamingPingCooldown) {
     return {
       guild,
       member:
-        Math.min(memberConfig.streaming_ping_cooldown, guild.maxCooldown) ||
-        true,
+        Math.min(memberConfig.streamingPingCooldown, guild.maxCooldown) || true,
     }
   }
 

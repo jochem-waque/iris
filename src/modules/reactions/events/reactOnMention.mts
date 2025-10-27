@@ -23,7 +23,7 @@ export const ReactOnMention = d
     const clone = message.mentions.parsedUsers.clone()
     clone.delete(message.author.id)
 
-    if (!clone.hasAny(...users.map((user) => user.user_id))) {
+    if (!clone.hasAny(...users.map((user) => user.userId))) {
       return
     }
 

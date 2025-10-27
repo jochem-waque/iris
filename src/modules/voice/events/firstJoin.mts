@@ -70,20 +70,20 @@ export const FirstJoin = d
     }
 
     let condition: SQL | undefined = eq(
-      messageTable.voice_id,
+      messageTable.voiceId,
       newState.channelId,
     )
 
     if (message) {
       Database.insert(messageTable)
         .values({
-          channel_id: message.channelId,
-          message_id: message.id,
-          voice_id: newState.channelId,
+          channelId: message.channelId,
+          messageId: message.id,
+          voiceId: newState.channelId,
         })
         .run()
 
-      condition = and(condition, not(eq(messageTable.message_id, message.id)))
+      condition = and(condition, not(eq(messageTable.messageId, message.id)))
     }
 
     const old = Database.delete(messageTable).where(condition).returning().all()

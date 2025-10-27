@@ -29,10 +29,10 @@ export const AddActivity = modal({
     }
 
     const newActivity = Database.insert(activitiesTable)
-      .values({ label: name, guild_id: interaction.guildId })
+      .values({ label: name, guildId: interaction.guildId })
       .onConflictDoUpdate({
-        target: [activitiesTable.label, activitiesTable.guild_id],
-        set: { last_used: new Date() },
+        target: [activitiesTable.label, activitiesTable.guildId],
+        set: { lastUsed: new Date() },
       })
       .returning()
       .get()
