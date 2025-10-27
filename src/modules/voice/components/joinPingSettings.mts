@@ -1,7 +1,11 @@
 import d from "disfluent"
 import { and, desc, eq } from "drizzle-orm"
 import { Database } from "../../../index.mjs"
-import { guildConfigTable, memberConfigTable } from "../../../schema.mjs"
+import {
+  guildConfigTable,
+  joinCooldownTable,
+  memberConfigTable,
+} from "../../../schema.mjs"
 import { joinPings, pingsMessage } from "../commands/pings.mjs"
 import { Cooldowns } from "../cooldown.mjs"
 
@@ -84,6 +88,10 @@ export const JoinPingSettings = d
         })
         .returning()
         .get()
+
+      tx.delete(joinCooldownTable)
+        .where(eq(joinCooldownTable.guildId, interaction.guildId))
+        .run()
 
       return [guildConfig, memberConfig]
     })

@@ -1,7 +1,11 @@
 import d from "disfluent"
 import { and, desc, eq } from "drizzle-orm"
 import { Database } from "../../../index.mjs"
-import { guildConfigTable, memberConfigTable } from "../../../schema.mjs"
+import {
+  guildConfigTable,
+  memberConfigTable,
+  streamCooldownTable,
+} from "../../../schema.mjs"
 import { pingsMessage, streamingPings } from "../commands/pings.mjs"
 import { Cooldowns } from "../cooldown.mjs"
 
@@ -83,6 +87,10 @@ export const StreamingPingSettings = d
         })
         .returning()
         .get()
+
+      tx.delete(streamCooldownTable)
+        .where(eq(streamCooldownTable.guildId, interaction.guildId))
+        .run()
 
       return [guildConfig, memberConfig]
     })

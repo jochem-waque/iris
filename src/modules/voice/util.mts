@@ -76,6 +76,7 @@ function hasCooldown(
 
 function addCooldown(
   source: "join" | "streaming",
+  guildId: string,
   channelId: string,
   userId: string,
   millis: number,
@@ -87,6 +88,7 @@ function addCooldown(
       channelId,
       userId,
       expiresAt: new Date(Date.now() + millis),
+      guildId,
     })
     .onConflictDoUpdate({
       target: [table.userId, table.channelId],
@@ -171,7 +173,7 @@ export function voiceStatus({
         : streamingPings(guildConfig, memberConfig)
 
     if (typeof member === "number" && voiceId && source) {
-      addCooldown(source, voiceId, mention, member * 60 * 1000)
+      addCooldown(source, guild.id, voiceId, mention, member * 60 * 1000)
     }
   }
 
