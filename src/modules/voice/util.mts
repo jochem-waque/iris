@@ -131,10 +131,6 @@ export function voiceStatus({
     mention = undefined
   }
 
-  if (mention && source && voiceId && hasCooldown(source, guild.id, mention)) {
-    mention = undefined
-  }
-
   if (!force && !mention) {
     return {}
   }
@@ -155,7 +151,7 @@ export function voiceStatus({
         .where(
           and(
             eq(memberConfigTable.guildId, guild.id),
-            eq(memberConfigTable.userId, mention),
+            eq(memberConfigTable.userId, mention ?? ""),
           ),
         )
         .orderBy(desc(memberConfigTable.timestamp))
@@ -170,8 +166,18 @@ export function voiceStatus({
         ? joinPings(guildConfig, memberConfig)
         : streamingPings(guildConfig, memberConfig)
 
-    if (typeof member === "number" && voiceId && source) {
-      addCooldown(source, guild.id, voiceId, mention, member * 60 * 1000)
+    switch (true) {
+      case member === false:
+        mention = undefined
+        break
+      case typeof member === "number" && source !== undefined:
+        if (hasCooldown(source, guild.id, mention)) {
+          mention = undefined
+          break
+        }
+
+        addCooldown(source, guild.id, mention, member * 60 * 1000)
+        break
     }
   }
 
