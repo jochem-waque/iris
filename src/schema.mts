@@ -86,11 +86,10 @@ export const joinCooldownTable = sqliteTable(
   {
     id: int().primaryKey(),
     userId: text("user_id").notNull(),
-    channelId: text("channel_id").notNull(),
     guildId: text("guild_id").notNull(),
     expiresAt: int("expiresAt", { mode: "timestamp_ms" }).notNull(),
   },
-  (table) => [unique().on(table.channelId, table.userId)],
+  (table) => [unique().on(table.guildId, table.userId)],
 )
 
 export const streamCooldownTable = sqliteTable(
@@ -98,9 +97,8 @@ export const streamCooldownTable = sqliteTable(
   {
     id: int().primaryKey(),
     userId: text("user_id").notNull(),
-    channelId: text("channel_id").notNull(),
     guildId: text("guild_id").notNull(),
     expiresAt: int("expiresAt", { mode: "timestamp_ms" }).notNull(),
   },
-  (table) => [unique().on(table.channelId, table.userId)],
+  (table) => [unique().on(table.guildId, table.userId)],
 )

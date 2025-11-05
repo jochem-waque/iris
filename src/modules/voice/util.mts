@@ -54,7 +54,7 @@ import { ServerStreamingPingOptOut } from "./components/serverStreamingPingOptOu
 
 function hasCooldown(
   source: "join" | "streaming",
-  channelId: string,
+  guildId: string,
   userId: string,
 ) {
   const table = source === "join" ? joinCooldownTable : streamCooldownTable
@@ -64,7 +64,7 @@ function hasCooldown(
     .where(
       and(
         gt(table.expiresAt, sql`UNIXEPOCH('subsecond') * 1000`),
-        eq(table.channelId, channelId),
+        eq(table.guildId, guildId),
         eq(table.userId, userId),
       ),
     )
@@ -77,7 +77,6 @@ function hasCooldown(
 function addCooldown(
   source: "join" | "streaming",
   guildId: string,
-  channelId: string,
   userId: string,
   millis: number,
 ) {
@@ -85,13 +84,12 @@ function addCooldown(
 
   Database.insert(table)
     .values({
-      channelId,
       userId,
       expiresAt: new Date(Date.now() + millis),
       guildId,
     })
     .onConflictDoUpdate({
-      target: [table.userId, table.channelId],
+      target: [table.userId, table.guildId],
       set: { expiresAt: new Date(Date.now() + millis) },
     })
     .run()
@@ -133,7 +131,7 @@ export function voiceStatus({
     mention = undefined
   }
 
-  if (mention && source && voiceId && hasCooldown(source, voiceId, mention)) {
+  if (mention && source && voiceId && hasCooldown(source, guild.id, mention)) {
     mention = undefined
   }
 
