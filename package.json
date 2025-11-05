@@ -33,7 +33,8 @@
     "zod": "^4.1.12"
   },
   "optionalDependencies": {
-    "bufferutil": "^4.0.9"
+    "bufferutil": "^4.0.9",
+    "zlib-sync": "^0.1.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
