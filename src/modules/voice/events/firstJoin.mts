@@ -6,7 +6,7 @@
 
 import { ChannelType, PermissionFlagsBits } from "discord.js"
 import d from "disfluent"
-import { and, eq, not, SQL } from "drizzle-orm"
+import { and, eq, not } from "drizzle-orm"
 import { Database } from "../../../index.mjs"
 import { messageTable } from "../../../schema.mjs"
 import {
@@ -62,19 +62,9 @@ export const FirstJoin = d
 
     const channel = await getTextChannel(newState.channel)
 
-    let message
+    const message = await channel.send(messageOptions)
+
     try {
-      message = await channel.send(messageOptions)
-    } catch (e) {
-      console.error(e)
-    }
-
-    let condition: SQL | undefined = eq(
-      messageTable.voiceId,
-      newState.channelId,
-    )
-
-    if (message) {
       Database.insert(messageTable)
         .values({
           channelId: message.channelId,
@@ -82,11 +72,20 @@ export const FirstJoin = d
           voiceId: newState.channelId,
         })
         .run()
-
-      condition = and(condition, not(eq(messageTable.messageId, message.id)))
+    } catch (e) {
+      await message.delete()
+      throw e
     }
 
-    const old = Database.delete(messageTable).where(condition).returning().all()
+    const old = Database.delete(messageTable)
+      .where(
+        and(
+          eq(messageTable.voiceId, newState.channelId),
+          not(eq(messageTable.messageId, message.id)),
+        ),
+      )
+      .returning()
+      .all()
 
     await deleteOldMessages(channel.guild, old)
   })
