@@ -1,6 +1,6 @@
 # Privacy Policy
 
-To facilitate the service, various data are received from Discord and processed, cached and/or stored in a database.
+To provide the service, various data are received from Discord and processed, cached and/or stored in a database.
 
 ## Data Processing
 
@@ -10,11 +10,11 @@ The following data is provided by Discord and processed by the service:
 - Server data, including, but not limited to: server names, server channel information, voice channel states, server emojis.
 - Message data, including, but not limited to: the contents of messages, reactions on messages.
 
-Some of this data may be temporarily cached. Data is not stored unless explicitly stated.
+Some of this data may be temporarily cached in memory, or included in temporary log files. Data is not stored long-term unless explicitly stated.
 
 ## Data Storage
 
-The following data is stored by the service:
+The following data is stored long-term by the service:
 
 - User generated content:
   - Activity labels.
@@ -25,8 +25,6 @@ The following data is stored by the service:
   - User IDs.
   - Text channel IDs.
   - Voice channel IDs.
- 
-No other data is stored.
 
 ## Data Location
 
