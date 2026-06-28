@@ -16,10 +16,7 @@ export const ActivityDropdown = d
   .string("activity")
   .placeholder("Select the activity")
   .options({
-    "Add new": d
-      .select()
-      .stringOption("add_new" as string)
-      .emoji("➕"),
+    "Add new": d.select().stringOption("add_new").emoji("➕"),
   })
   .handler(async (interaction) => {
     if (!interaction.values[0] || !interaction.inCachedGuild()) {
