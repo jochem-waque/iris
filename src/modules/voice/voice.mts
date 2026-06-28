@@ -9,17 +9,6 @@ import { Activities } from "./commands/activities.mjs"
 import { Link } from "./commands/link.mjs"
 import { Pings } from "./commands/pings.mjs"
 import { Server } from "./commands/server.mjs"
-import { ActivityDropdown } from "./components/activityDropdown.mjs"
-import { JoinPingSettings } from "./components/joinPingSettings.mjs"
-import { NoiseDropdown } from "./components/noiseDropdown.mjs"
-import { RemoveActivityDropdown } from "./components/removeActivityDropdown.mjs"
-import { ServerDefaultJoinPingCooldown } from "./components/serverDefaultJoinPingCooldown.mjs"
-import { ServerDefaultStreamingPingCooldown } from "./components/serverDefaultStreamingPingCooldown.mjs"
-import { ServerJoinPingOptOut } from "./components/serverJoinPingOptOut.mjs"
-import { ServerMaxJoinPingCooldown } from "./components/serverMaxJoinPingCooldown.mjs"
-import { ServerMaxStreamingPingCooldown } from "./components/serverMaxStreamingPingCooldown.mjs"
-import { ServerStreamingPingOptOut } from "./components/serverStreamingPingOptOut.mjs"
-import { StreamingPingSettings } from "./components/streamingPingSettings.mjs"
 import { FirstJoin } from "./events/firstJoin.mjs"
 import { LastLeave } from "./events/lastLeave.mjs"
 import { MemberStreams } from "./events/memberStreams.mjs"
@@ -32,17 +21,6 @@ export const Voice = d
   .addCommand(Link)
   .addCommand(Pings)
   .addCommand(Server)
-  .addComponent(ActivityDropdown)
-  .addComponent(JoinPingSettings)
-  .addComponent(NoiseDropdown)
-  .addComponent(RemoveActivityDropdown)
-  .addComponent(ServerDefaultJoinPingCooldown)
-  .addComponent(ServerDefaultStreamingPingCooldown)
-  .addComponent(ServerJoinPingOptOut)
-  .addComponent(ServerMaxJoinPingCooldown)
-  .addComponent(ServerMaxStreamingPingCooldown)
-  .addComponent(ServerStreamingPingOptOut)
-  .addComponent(StreamingPingSettings)
   .addEventHandler(FirstJoin)
   .addEventHandler(LastLeave)
   .addEventHandler(MemberStreams)

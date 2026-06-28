@@ -1,8 +1,12 @@
 {
-  "extends": ["@tsconfig/node24", "@tsconfig/strictest"],
+  "extends": [
+    "@tsconfig/node26/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json"
+  ],
   "compilerOptions": {
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "rootDir": "src"
   },
   "include": ["src/**/*"]
 }
